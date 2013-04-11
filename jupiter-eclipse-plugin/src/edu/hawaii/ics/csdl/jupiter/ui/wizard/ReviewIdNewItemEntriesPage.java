@@ -48,6 +48,7 @@ public class ReviewIdNewItemEntriesPage extends WizardPage {
   private Button restoreButtonInItemEntries;
   private Map<String, FieldItem> fieldItemIdFieldItemMap;
   private List<String> fieldItemIdList;
+private PropertyResource propertyResource;
   /**
    * @param project the project name.
    * @param pageName the page name.
@@ -91,7 +92,6 @@ public class ReviewIdNewItemEntriesPage extends WizardPage {
    * @return the control.
    */
   private Control createItemEntriesContent(Composite composite) {
-    PropertyResource propertyResource = PropertyResource.getInstance(this.project, true);
     String reviewIdString = PropertyConstraints.DEFAULT_REVIEW_ID;
     ReviewResource reviewResource = propertyResource.getReviewResource(reviewIdString, true);
     if (reviewResource != null) {
@@ -337,7 +337,6 @@ public class ReviewIdNewItemEntriesPage extends WizardPage {
    */
   protected void restoreItemEntries() {
     // read from .jupiter.
-    PropertyResource propertyResource = PropertyResource.getInstance(project, true);
     String defaultReviewID = PropertyConstraints.DEFAULT_REVIEW_ID;
     ReviewResource reviewResource = propertyResource.getReviewResource(defaultReviewID, true);
     if (reviewResource != null) {

@@ -1,6 +1,5 @@
 package edu.hawaii.ics.csdl.jupiter.ui.menu;
 
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
@@ -14,7 +13,6 @@ import org.eclipse.swt.widgets.MenuItem;
 import edu.hawaii.ics.csdl.jupiter.event.IReviewIssueModelListener;
 import edu.hawaii.ics.csdl.jupiter.event.ReviewIssueModelEvent;
 import edu.hawaii.ics.csdl.jupiter.model.reviewissue.ReviewIssue;
-import edu.hawaii.ics.csdl.jupiter.model.reviewissue.ReviewIssueModel;
 import edu.hawaii.ics.csdl.jupiter.model.reviewissue.ReviewIssueModelManager;
 import edu.hawaii.ics.csdl.jupiter.ui.view.editor.ReviewEditorView;
 import edu.hawaii.ics.csdl.jupiter.util.JupiterLogger;

@@ -45,6 +45,7 @@ public class ReviewIdNewFilePage extends WizardPage {
   private Table fileListTable;
   private Button addButtonInFile;
   private Button removeButtonInFile;
+private PropertyResource propertyResource;
 
   /**
    * Instantiates the review file configuration page.
@@ -145,7 +146,6 @@ public class ReviewIdNewFilePage extends WizardPage {
    */
   public void fillFileTable(String projectName) {
     IProject project = FileResource.getProject(projectName);
-    PropertyResource propertyResource = PropertyResource.getInstance(project, true);
     String defaultReviewId = PropertyConstraints.DEFAULT_REVIEW_ID;
     ReviewResource reviewResource = propertyResource.getReviewResource(defaultReviewId, true);
     if (reviewResource != null) {

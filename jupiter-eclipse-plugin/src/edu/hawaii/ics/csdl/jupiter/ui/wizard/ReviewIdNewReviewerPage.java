@@ -39,6 +39,7 @@ public class ReviewIdNewReviewerPage extends WizardPage {
   private Combo previousReviewIdCombo;
   private Map<String, ReviewerId> reviewers = new TreeMap<String, ReviewerId>();
   private IProject project;
+private PropertyResource propertyResource;
 
   /**
    * Instantiates the config reviewer page.
@@ -140,8 +141,7 @@ public class ReviewIdNewReviewerPage extends WizardPage {
   public void fillReviewerTable(boolean isUpdate) {
     removeAllItemsInReviewerTable();
     if (!isUpdate) {
-      PropertyResource reviewIdResource = PropertyResource.getInstance(this.project, true);
-      Map<String, ReviewerId> reviewersMap = reviewIdResource
+      Map<String, ReviewerId> reviewersMap = propertyResource
           .getReviewers(PropertyResource.DEFAULT_ID);
       this.reviewers = new TreeMap<String, ReviewerId>(reviewersMap);
     }

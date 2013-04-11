@@ -63,6 +63,7 @@ public class ReviewIdNewFilterPage extends WizardPage {
   private Combo statusFilterCombo;
   private Button fileCheckButton;
   private Combo fileFilterCombo;
+private PropertyResource propertyResource;
 
   /**
    * @param project the project.
@@ -106,7 +107,6 @@ public class ReviewIdNewFilterPage extends WizardPage {
    * @param composite the composite.
    */
   private void createFilterContent(Composite composite) {
-    PropertyResource propertyResource = PropertyResource.getInstance(project, true);
     String reviewIdString = PropertyConstraints.DEFAULT_REVIEW_ID;
     ReviewResource reviewResource = propertyResource.getReviewResource(reviewIdString, true);
     final ReviewId reviewId = reviewResource.getReviewId();

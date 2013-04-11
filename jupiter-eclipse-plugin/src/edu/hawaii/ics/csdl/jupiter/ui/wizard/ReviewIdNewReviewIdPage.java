@@ -40,6 +40,7 @@ public class ReviewIdNewReviewIdPage extends WizardPage {
   private List<String> tempReviewIdList = new ArrayList<String>();
   private Text descriptionText;
   private IProject project;
+private PropertyResource propertyResource;
 
   /**
    * Instantiates the config review id page.
@@ -144,8 +145,7 @@ public class ReviewIdNewReviewIdPage extends WizardPage {
   protected void handleProjectSelection(Event e) {
     String projectName = ((Combo) e.widget.getData()).getText();
     IProject project = FileResource.getProject(projectName);
-    PropertyResource reviewIdResource = PropertyResource.getInstance(this.project, false);
-    this.tempReviewIdList = Arrays.asList(reviewIdResource.getReviewIdNames());
+    this.tempReviewIdList = Arrays.asList(propertyResource.getReviewIdNames());
   }
   
   /**

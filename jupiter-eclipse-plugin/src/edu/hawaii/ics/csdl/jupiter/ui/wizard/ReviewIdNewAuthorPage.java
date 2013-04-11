@@ -35,6 +35,8 @@ public class ReviewIdNewAuthorPage extends WizardPage {
   private IProject project;
   private Combo authorCombo;
   private int clientWidth;
+
+private PropertyResource propertyResource;
   private static final double RATIO = 0.6;
   /**
    * Instantiates the config reviewer page.
@@ -85,7 +87,6 @@ public class ReviewIdNewAuthorPage extends WizardPage {
     authorLabel.setText(ReviewI18n.getString("ReviewIdNewAuthorPage.label.author"));
     this.authorCombo = new Combo(parent, SWT.READ_ONLY);
     authorCombo.setData(authorCombo);
-    PropertyResource propertyResource = PropertyResource.getInstance(this.project, true);
     String defaultReviewId = PropertyConstraints.DEFAULT_REVIEW_ID;
     ReviewId reviewId = propertyResource.getReviewId(defaultReviewId);
     Map<String, ReviewerId> reviewers = reviewId.getReviewers();

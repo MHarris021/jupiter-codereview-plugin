@@ -11,7 +11,6 @@ import org.eclipse.swt.widgets.Display;
 
 import edu.hawaii.ics.csdl.jupiter.event.ReviewIssueModelEvent;
 import edu.hawaii.ics.csdl.jupiter.model.reviewissue.ReviewIssueModel;
-import edu.hawaii.ics.csdl.jupiter.model.reviewissue.ReviewIssueModelManager;
 import edu.hawaii.ics.csdl.jupiter.util.JupiterLogger;
 
 /**
@@ -26,13 +25,13 @@ public class ProjectResourceChangeListener implements IResourceChangeListener,
                                                              IResourceDeltaVisitor {
   /** Jupiter logger */
   private JupiterLogger log = JupiterLogger.getLogger();
+private ReviewIssueModel reviewIssueModel;
 
   /**
    * @see org.eclipse.core.resources.IResourceChangeListener
    * #resourceChanged(org.eclipse.core.resources.IResourceChangeEvent)
    */
-  @Override
-  public void resourceChanged(IResourceChangeEvent event) {
+	public void resourceChanged(IResourceChangeEvent event) {
     IResource resource = event.getResource();
     if (((event.getType() & IResourceChangeEvent.POST_CHANGE) != 0)) {
       try {
@@ -50,7 +49,6 @@ public class ProjectResourceChangeListener implements IResourceChangeListener,
    * @see org.eclipse.core.resources.IResourceDeltaVisitor
    * #visit(org.eclipse.core.resources.IResourceDelta)
    */
-  @Override
   public boolean visit(IResourceDelta delta) throws CoreException {
     IResource resource = delta.getResource();
     int flag = delta.getFlags();
@@ -58,9 +56,8 @@ public class ProjectResourceChangeListener implements IResourceChangeListener,
     if (resource instanceof IProject && ((flag & IResourceDelta.OPEN) != 0)) {
       if (!((IProject) resource).isOpen()) {
         log.debug("project was closed: " + ((IProject) resource).getName());
-        ReviewIssueModel model = ReviewIssueModelManager.getInstance().getCurrentModel();
-        model.clear();
-        model.notifyListeners(ReviewIssueModelEvent.CLEAR);
+        reviewIssueModel.clear();
+        reviewIssueModel.notifyListeners(ReviewIssueModelEvent.CLEAR);
         Display.getDefault().asyncExec(new Runnable() {
           public void run() {
             ReviewTableViewAction.NOTIFY_EDITOR.run();

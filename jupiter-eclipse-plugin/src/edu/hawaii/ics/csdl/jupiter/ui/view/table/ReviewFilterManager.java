@@ -14,7 +14,6 @@ import edu.hawaii.ics.csdl.jupiter.model.review.ReviewId;
 import edu.hawaii.ics.csdl.jupiter.model.review.ReviewModel;
 import edu.hawaii.ics.csdl.jupiter.model.review.ReviewerId;
 import edu.hawaii.ics.csdl.jupiter.model.reviewissue.KeyManager;
-import edu.hawaii.ics.csdl.jupiter.model.reviewissue.Ordinal;
 import edu.hawaii.ics.csdl.jupiter.model.reviewissue.Resolution;
 import edu.hawaii.ics.csdl.jupiter.model.reviewissue.ResolutionKeyManager;
 import edu.hawaii.ics.csdl.jupiter.model.reviewissue.Severity;
@@ -38,6 +37,10 @@ public class ReviewFilterManager {
 
 	/** Singleton instance. */
 	private static ReviewFilterManager theInstance = new ReviewFilterManager();
+
+	private static ReviewModel reviewModel;
+
+	private static PropertyResource propertyResource;
 
 	/** The <code>ViewerFilter</code> instance. */
 	private ViewerFilter viewerFilter;
@@ -122,7 +125,6 @@ public class ReviewFilterManager {
 		boolean isFilterEanbled = store
 				.getBoolean(FilterPreferencePage.ENABLE_FILTER_STORE_KEY);
 		if (isFilterEanbled) {
-			ReviewModel reviewModel = ReviewModel.getInstance();
 			IProject project = reviewModel.getProjectManager().getProject();
 			ReviewId reviewId = reviewModel.getReviewIdManager().getReviewId();
 			if (store
@@ -211,8 +213,6 @@ public class ReviewFilterManager {
 	public static ViewerFilter createFilterFromProperty(IProject project,
 			ReviewId reviewId, String phaseNameKey) {
 		ReviewFilter filter = new ReviewFilter();
-		PropertyResource propertyResource = PropertyResource.getInstance(
-				project, true);
 		String reviewIdString = reviewId.getReviewId();
 		ReviewResource reviewResource = propertyResource.getReviewResource(
 				reviewIdString, true);
@@ -235,7 +235,6 @@ public class ReviewFilterManager {
 			if (entry != null && entry.isEnabled()) {
 				String reviewer = entry.getValueKey();
 				if (reviewer.equals(ReviewerId.AUTOMATIC_KEY)) {
-					ReviewModel reviewModel = ReviewModel.getInstance();
 					ReviewerId reviewerId = reviewModel.getReviewerIdManager()
 							.getReviewerId();
 					reviewer = reviewerId.getReviewerId();
@@ -265,8 +264,7 @@ public class ReviewFilterManager {
 			if (entry != null && entry.isEnabled()) {
 				String assignedTo = entry.getValueKey();
 				if (assignedTo.equals(ReviewerId.AUTOMATIC_KEY)) {
-					ReviewModel reviewMode = ReviewModel.getInstance();
-					ReviewerId reviewerId = reviewMode.getReviewerIdManager()
+					ReviewerId reviewerId = reviewModel.getReviewerIdManager()
 							.getReviewerId();
 					assignedTo = reviewerId.getReviewerId();
 				}

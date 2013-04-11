@@ -6,6 +6,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.annotation.Resource;
+import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.core.runtime.FileLocator;

@@ -14,7 +14,6 @@ import edu.hawaii.ics.csdl.jupiter.event.ReviewIssueModelEvent;
 import edu.hawaii.ics.csdl.jupiter.file.FileResource;
 import edu.hawaii.ics.csdl.jupiter.model.reviewissue.ReviewIssue;
 import edu.hawaii.ics.csdl.jupiter.model.reviewissue.ReviewIssueModel;
-import edu.hawaii.ics.csdl.jupiter.model.reviewissue.ReviewIssueModelManager;
 import edu.hawaii.ics.csdl.jupiter.util.JupiterLogger;
 
 /**
@@ -27,6 +26,7 @@ public class MarkerResourceChangeListener
              implements IResourceChangeListener, IResourceDeltaVisitor {
   /** Jupiter logger */
   private JupiterLogger log = JupiterLogger.getLogger();
+private ReviewIssueModel reviewIssueModel;
 
     /**
      * Implements resource delta for the active file and accepts the implementing
@@ -102,14 +102,11 @@ public class MarkerResourceChangeListener
         isReviewMarker = true;
         String reviewIssueKey = ReviewMarker.ATTRIBUTE_REVIEW_ISSUE;
         String reviewIssueId = (String) marker.getAttribute(reviewIssueKey);
-        ReviewIssueModel model = ReviewIssueModelManager.getInstance().getCurrentModel();
-        ReviewIssue savingReviewIssue = model.get(reviewIssueId);
+        ReviewIssue savingReviewIssue = reviewIssueModel.get(reviewIssueId);
         savingReviewIssue.setLine(newLineNumber.intValue() + "");
       }
       if (isReviewMarker) {
         log.debug("review marker was moved along with resource change.");
-        ReviewIssueModelManager reviewIssueModelManager = ReviewIssueModelManager.getInstance();
-        ReviewIssueModel reviewIssueModel = reviewIssueModelManager.getCurrentModel();
         reviewIssueModel.notifyListeners(ReviewIssueModelEvent.EDIT);
       }
       return true; // visit the children

@@ -29,7 +29,9 @@ import edu.hawaii.ics.csdl.jupiter.ui.view.table.ReviewTableView;
  */
 public class MarkerSelectionListener implements ISelectionListener {
 
-  /**
+  private ReviewModel reviewModel;
+
+/**
    * @see org.eclipse.ui.ISelectionListener #selectionChanged(org.eclipse.ui.IWorkbenchPart,
    *      org.eclipse.jface.viewers.ISelection)
    */
@@ -38,7 +40,6 @@ public class MarkerSelectionListener implements ISelectionListener {
       ITextSelection textSelection = (ITextSelection) selection;
       String lineNumber = String.valueOf(textSelection.getStartLine() + 1);
       
-      ReviewModel reviewModel = ReviewModel.getInstance();
       IProject project = reviewModel.getProjectManager().getProject();
 
       if (project == null) {

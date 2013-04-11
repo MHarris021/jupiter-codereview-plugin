@@ -10,7 +10,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
@@ -43,6 +42,7 @@ public class ReviewIdNewDefaultItemsPage extends WizardPage {
   private ComboList resolutionCombo;
   private ComboList statusCombo;
   private int clientWidth;
+private PropertyResource propertyResource;
   private static final double RATIO = 0.6;
 
   /**
@@ -93,7 +93,6 @@ public class ReviewIdNewDefaultItemsPage extends WizardPage {
    * @return the control.
    */
   private Control createDefaultItems(Composite composite) {
-    PropertyResource propertyResource = PropertyResource.getInstance(project, true);
     String reviewIdString = PropertyConstraints.DEFAULT_REVIEW_ID;
     ReviewResource reviewResource = propertyResource.getReviewResource(reviewIdString, true);
     ReviewId reviewId = null;

@@ -110,6 +110,8 @@ public class FilterPreferencePage extends PreferencePage implements IWorkbenchPr
    */
   private BooleanFieldEditor filterEnabledField;
 private ReviewModel reviewModel;
+private ReviewIssueModelManager reviewIssueModelManager;
+private PropertyResource propertyResource;
 
   /**
    * Creates the Jupiter preference contents.
@@ -353,8 +355,8 @@ private ReviewModel reviewModel;
     ReviewId reviewId = reviewModel.getReviewIdManager().getReviewId();
     String[] targetFileArray = {""};
     if (project != null && reviewId != null) {
-      ReviewIssueModel model = ReviewIssueModelManager.getInstance().createReviewIssueModel(project, reviewId);
-      targetFileArray = model.getTargetFileArray();
+      ReviewIssueModel reviewIssueModel = reviewIssueModelManager.createReviewIssueModel(project, reviewId);
+      targetFileArray = reviewIssueModel.getTargetFileArray();
     }
     this.filterFileCombo.setItems(targetFileArray);
     String fileKey = this.store.getString(FILTER_FILE_COMBO_KEY);
@@ -448,8 +450,7 @@ private ReviewModel reviewModel;
     IProject project = reviewModel.getProjectManager().getProject();
     if (reviewId != null) {
       String reviewIdString = reviewId.getReviewId();
-      PropertyResource reviewidResource = PropertyResource.getInstance(project, false);
-      String[] items = reviewidResource.getReviewerIdNames(reviewIdString);
+      String[] items = propertyResource.getReviewerIdNames(reviewIdString);
       filterAssignedToCombo.setItems((items == null) ? new String[] {} : items);
       IPreferenceStore store = ReviewPluginImpl.getInstance().getPreferenceStore();
     }
@@ -488,8 +489,7 @@ private ReviewModel reviewModel;
     IProject project = reviewModel.getProjectManager().getProject();
     if (reviewId != null) {
       String reviewIdString = reviewId.getReviewId();
-      PropertyResource reviewIdResource = PropertyResource.getInstance(project, false);
-      String[] items = reviewIdResource.getReviewerIdNames(reviewIdString);
+      String[] items = propertyResource.getReviewerIdNames(reviewIdString);
       filterReviewerCombo.setItems((items == null) ? new String[] {} : items);
       IPreferenceStore store = ReviewPluginImpl.getInstance().getPreferenceStore();
     }

@@ -16,7 +16,6 @@ import edu.hawaii.ics.csdl.jupiter.ReviewException;
 import edu.hawaii.ics.csdl.jupiter.ReviewPluginImpl;
 import edu.hawaii.ics.csdl.jupiter.model.reviewissue.ReviewIssue;
 import edu.hawaii.ics.csdl.jupiter.model.reviewissue.ReviewIssueModel;
-import edu.hawaii.ics.csdl.jupiter.model.reviewissue.ReviewIssueModelManager;
 import edu.hawaii.ics.csdl.jupiter.ui.view.editor.ReviewEditorView;
 import edu.hawaii.ics.csdl.jupiter.ui.view.table.ReviewTableView;
 import edu.hawaii.ics.csdl.jupiter.ui.view.table.ReviewTableViewAction;
@@ -68,6 +67,7 @@ public class ReviewMarkerResolutionGenerator implements IMarkerResolutionGenerat
    */
   private class ReviewMarkerResolution implements IMarkerResolution, IMarkerResolution2 {
     private ReviewIssue reviewIssue;
+	private ReviewIssueModel reviewIssueModel;
     /**
      * Instantiates review marker resolution.
      * @param marker the marker.
@@ -76,8 +76,7 @@ public class ReviewMarkerResolutionGenerator implements IMarkerResolutionGenerat
       String reviewIssueKey = ReviewMarker.ATTRIBUTE_REVIEW_ISSUE;
       try {
         String reviewIssueId = (String) marker.getAttribute(reviewIssueKey);
-        ReviewIssueModel model = ReviewIssueModelManager.getInstance().getCurrentModel();
-        this.reviewIssue = model.get(reviewIssueId);
+        this.reviewIssue = reviewIssueModel.get(reviewIssueId);
       } 
       catch (CoreException e) {
         e.printStackTrace();
@@ -100,7 +99,6 @@ public class ReviewMarkerResolutionGenerator implements IMarkerResolutionGenerat
     public void run(IMarker marker) {
       if (reviewIssue != null) {
         String issueId = reviewIssue.getIssueId();
-        ReviewIssueModel model = ReviewIssueModelManager.getInstance().getCurrentModel();
         ReviewTableView view = ReviewTableView.bringViewToTop();
         if (view == null) {
           log.warning("Review table view is null.");

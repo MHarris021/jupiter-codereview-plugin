@@ -2,6 +2,8 @@ package edu.hawaii.ics.csdl.jupiter.file.review;
 
 import javax.xml.bind.annotation.XmlElement;
 
+import edu.hawaii.ics.csdl.jupiter.file.property.CreationDate;
+
 /**
  * 
  * 
