@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Preference>
+    <General>
+        <EnableFilter>false</EnableFilter>
+        <EnableUpdate>true</EnableUpdate>
+        <UpdateUrl>http://jupiter-eclipse-plugin.googlecode.com/svn/trunk/site/site.xml</UpdateUrl>
+    </General>
+    <View default="phase.individual">
+        <Phase name="phase.individual">
+            <ColumnEntry enable="true" name="columnHeader.label.linkIcon" resizable="false" width="19"/>
+            <ColumnEntry enable="true" name="columnHeader.label.severity" resizable="true" width="55"/>
+            <ColumnEntry enable="true" name="columnHeader.label.type" resizable="true" width="68"/>
+            <ColumnEntry enable="true" name="columnHeader.label.summary" resizable="true" width="320"/>
+            <ColumnEntry enable="true" name="columnHeader.label.description" resizable="true" width="420"/>
+            <ColumnEntry enable="true" name="columnHeader.label.modificationDate" resizable="true" width="70"/>
+            <ColumnEntry enable="false" name="columnHeader.label.annotation" resizable="true" width="70"/>
+            <ColumnEntry enable="false" name="columnHeader.label.revision" resizable="true" width="70"/>
+            <ColumnEntry enable="false" name="columnHeader.label.resolution" resizable="true" width="115"/>
+            <ColumnEntry enable="false" name="columnHeader.label.status" resizable="true" width="77"/>
+            <ColumnEntry enable="false" name="columnHeader.label.assignedTo" resizable="true" width="70"/>
+            <ColumnEntry enable="false" name="columnHeader.label.file" resizable="true" width="130"/>
+            <ColumnEntry enable="false" name="columnHeader.label.line" resizable="true" width="31"/>
+            <ColumnEntry enable="false" name="columnHeader.label.reviewer" resizable="true" width="70"/>
+            <ColumnEntry enable="false" name="columnHeader.label.creationDate" resizable="true" width="70"/>
+            <ColumnEntry enable="false" name="columnHeader.label.id" resizable="true" width="70"/>
+        </Phase>
+        <Phase name="phase.team">
+            <ColumnEntry enable="true" name="columnHeader.label.linkIcon" resizable="false" width="19"/>
+            <ColumnEntry enable="true" name="columnHeader.label.severity" resizable="true" width="55"/>
+            <ColumnEntry enable="true" name="columnHeader.label.summary" resizable="true" width="350"/>
+            <ColumnEntry enable="false" name="columnHeader.label.annotation" resizable="true" width="150"/>
+            <ColumnEntry enable="true" name="columnHeader.label.file" resizable="true" width="350"/>
+            <ColumnEntry enable="true" name="columnHeader.label.line" resizable="true" width="32"/>
+            <ColumnEntry enable="true" name="columnHeader.label.resolution" resizable="true" width="115"/>
+            <ColumnEntry enable="true" name="columnHeader.label.reviewer" resizable="true" width="70"/>
+            <ColumnEntry enable="false" name="columnHeader.label.assignedTo" resizable="true" width="100"/>
+            <ColumnEntry enable="false" name="columnHeader.label.type" resizable="true" width="50"/>
+            <ColumnEntry enable="false" name="columnHeader.label.description" resizable="true" width="70"/>
+            <ColumnEntry enable="false" name="columnHeader.label.revision" resizable="true" width="70"/>
+            <ColumnEntry enable="false" name="columnHeader.label.status" resizable="true" width="77"/>
+            <ColumnEntry enable="false" name="columnHeader.label.creationDate" resizable="true" width="70"/>
+            <ColumnEntry enable="false" name="columnHeader.label.modificationDate" resizable="true" width="70"/>
+            <ColumnEntry enable="false" name="columnHeader.label.id" resizable="true" width="70"/>
+        </Phase>
+        <Phase name="phase.rework">
+            <ColumnEntry enable="true" name="columnHeader.label.linkIcon" resizable="false" width="19"/>
+            <ColumnEntry enable="true" name="columnHeader.label.severity" resizable="true" width="55"/>
+            <ColumnEntry enable="true" name="columnHeader.label.resolution" resizable="true" width="112"/>
+            <ColumnEntry enable="true" name="columnHeader.label.summary" resizable="true" width="300"/>
+            <ColumnEntry enable="true" name="columnHeader.label.annotation" resizable="true" width="150"/>
+            <ColumnEntry enable="true" name="columnHeader.label.revision" resizable="true" width="150"/>
+            <ColumnEntry enable="true" name="columnHeader.label.status" resizable="true" width="86"/>
+            <ColumnEntry enable="true" name="columnHeader.label.assignedTo" resizable="true" width="70"/>
+            <ColumnEntry enable="false" name="columnHeader.label.file" resizable="true" width="300"/>
+            <ColumnEntry enable="false" name="columnHeader.label.line" resizable="true" width="31"/>
+            <ColumnEntry enable="false" name="columnHeader.label.type" resizable="true" width="50"/>
+            <ColumnEntry enable="false" name="columnHeader.label.description" resizable="true" width="70"/>
+            <ColumnEntry enable="false" name="columnHeader.label.reviewer" resizable="true" width="70"/>
+            <ColumnEntry enable="false" name="columnHeader.label.creationDate" resizable="true" width="70"/>
+            <ColumnEntry enable="false" name="columnHeader.label.modificationDate" resizable="true" width="70"/>
+            <ColumnEntry enable="false" name="columnHeader.label.id" resizable="true" width="70"/>
+        </Phase>
+    </View>
+</Preference>

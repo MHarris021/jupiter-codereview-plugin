@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Review id="web 1">
+    <ReviewIssue id="HEFPA937">
+        <Annotation></Annotation>
+        <AssignedTo>tetn</AssignedTo>
+        <Description></Description>
+        <File line="29">src/main/java/sf/bank/vehicleloans/beans/ApplicantPO.java</File>
+        <Resolution>item.label.unset</Resolution>
+        <ReviewIssueMeta>
+            <CreationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z"/>
+            <LastModificationDate format="yyyy-MM-dd :: HH:mm:ss:SSS z"/>
+        </ReviewIssueMeta>
+        <ReviewerId>tetn</ReviewerId>
+        <Revision></Revision>
+        <Severity>item.severity.label.normal</Severity>
+        <Status>item.status.label.open</Status>
+        <Summary>Inappropriate Name</Summary>
+        <Type>item.type.label.codingStandards</Type>
+    </ReviewIssue>
+</Review>
