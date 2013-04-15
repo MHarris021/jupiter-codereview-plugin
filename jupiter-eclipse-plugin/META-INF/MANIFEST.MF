@@ -88,10 +88,3 @@ Export-Package: edu.hawaii.ics.csdl.jupiter;uses:="junit.framework,edu.hawaii.ic
    org.eclipse.swt.widgets",
  edu.hawaii.ics.csdl.jupiter.util;uses:="edu.hawaii.ics.csdl.jupiter"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: org.aopalliance.aop;version="1.0.0",
- org.springframework.aop;version="3.1.4.RELEASE",
- org.springframework.beans;version="3.1.4.RELEASE",
- org.springframework.context;version="3.1.4.RELEASE",
- org.springframework.context.annotation;version="3.1.4.RELEASE",
- org.springframework.core;version="3.1.4.RELEASE",
- org.springframework.stereotype;version="3.1.4.RELEASE"
