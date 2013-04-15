@@ -1,13 +1,14 @@
 package edu.hawaii.ics.csdl.jupiter.event;
 
+import junit.framework.TestCase;
+
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import junit.framework.TestCase;
 import edu.hawaii.ics.csdl.jupiter.ReviewPlugin;
-import edu.hawaii.ics.csdl.jupiter.ReviewPluginImpl;
 import edu.hawaii.ics.csdl.jupiter.ReviewPluginConfiguration;
+import edu.hawaii.ics.csdl.jupiter.ReviewPluginImpl;
 import edu.hawaii.ics.csdl.jupiter.model.review.ReviewModel;
 
 /**
@@ -33,7 +34,7 @@ public class CodeReviewModelEventTest extends TestCase {
     int addType = ReviewIssueModelEvent.ADD;
     int deleteType = ReviewIssueModelEvent.DELETE;    
     
-    ReviewModel reviewModel;
+    ReviewModel reviewModel = new ReviewModel();
 	ReviewIssueModelEvent event = new ReviewIssueModelEvent(null, mergeType | addType, reviewModel);
     int eventType = event.getEventType();
     assertEquals("Checking merge type. ", true, (eventType & mergeType) != 0);

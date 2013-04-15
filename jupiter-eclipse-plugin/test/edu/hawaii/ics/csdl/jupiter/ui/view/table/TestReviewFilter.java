@@ -3,7 +3,6 @@ package edu.hawaii.ics.csdl.jupiter.ui.view.table;
 import java.util.Calendar;
 import java.util.Date;
 
-import edu.hawaii.ics.csdl.jupiter.ReviewException;
 import edu.hawaii.ics.csdl.jupiter.ReviewTestCase;
 import edu.hawaii.ics.csdl.jupiter.model.reviewissue.ReviewIssue;
 
@@ -24,16 +23,11 @@ public class TestReviewFilter extends ReviewTestCase {
    */
   public void setUp() throws Exception {
     super.setUp();
-    try {
-      this.codeReview = new ReviewIssue(new Date(), new Date(), "Taro Yamada", "John Smith",
+    this.codeReview = new ReviewIssue(new Date(), new Date(), "Taro Yamada", "John Smith",
           "doc/review/bar/baz/Foo.java", "10", praise, normal, "This is summary.",
           "This is nice description.!? The second sentence continues.",
           "This is annotation for review.", "This is revision comment.", validFixlater, unresolved,
           null);
-    }
-    catch (ReviewException e) {
-      fail("Should not throw CodeReviewException: " + e.getMessage());
-    }
   }
 
   /**

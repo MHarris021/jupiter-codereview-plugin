@@ -1,13 +1,12 @@
 package edu.hawaii.ics.csdl.jupiter;
 
+import junit.framework.TestCase;
 import edu.hawaii.ics.csdl.jupiter.model.reviewissue.Ordinal;
 import edu.hawaii.ics.csdl.jupiter.model.reviewissue.Resolution;
 import edu.hawaii.ics.csdl.jupiter.model.reviewissue.Severity;
 import edu.hawaii.ics.csdl.jupiter.model.reviewissue.Status;
 import edu.hawaii.ics.csdl.jupiter.model.reviewissue.Type;
 import edu.hawaii.ics.csdl.jupiter.util.ResourceBundleKey;
-
-import junit.framework.TestCase;
 
 /**
  * Provides test case abstract class for code review system. Sets up necessary item type instances.
@@ -17,13 +16,13 @@ import junit.framework.TestCase;
  */
 public class ReviewTestCase extends TestCase {
   /** The defect <code>Type</code> instance. */
-  protected Ordinal defect;
+  protected Type defect;
   /** The externalIssue <code>Type</code> instance. */
   protected Ordinal externalIssue;
   /** The question <code>Type</code> instance. */
-  protected Ordinal question;
+  protected Type question;
   /** The praise <code>Type</code> instance. */
-  protected Ordinal praise;
+  protected Type praise;
   /** The critical <code>Severity</code> instance. */
   protected Severity critical;
   /** The major <code>Severity</code> instance. */
