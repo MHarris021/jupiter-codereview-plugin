@@ -196,14 +196,14 @@ public class ReviewEditorView extends ViewPart {
 	 *            The <code>IMenuManager</code> instance.
 	 */
 	private void fillLocalToolBar(IToolBarManager manager) {
-		// manager.add(ReviewEditorViewAction.UNDO);
+		// manager.add(ReviewEditorActionContainer.UNDO);
 		manager.add(ReviewEditorViewAction.GOTO);
 		manager.add(new Separator("Additions"));
 		manager.add(ReviewEditorViewAction.NEXT);
 		manager.add(ReviewEditorViewAction.PREVIOUS);
 		manager.add(new Separator("Additions"));
-		manager.add(ReviewEditorViewAction.SAVE);
-		manager.add(ReviewEditorViewAction.CLEAR);
+		manager.add(ReviewEditorViewAction.);
+		manager.add(ReviewEditorViewAction.clearAction);
 	}
 
 	/**
@@ -222,7 +222,7 @@ public class ReviewEditorView extends ViewPart {
 				ReviewEditorViewAction.SAVE);
 		// RetargetAction action = new RetargetAction();
 		// getViewSite().getPage().getWorkbenchWindow().getPartService().
-		// addPartListener(ReviewEditorViewAction.SAVE);
+		// addPartListener(ReviewEditorActionContainer.SAVE);
 	}
 
 	/**
@@ -732,7 +732,7 @@ public class ReviewEditorView extends ViewPart {
 		ReviewEditorViewAction.NEXT.setEnabled(isEnabled);
 		ReviewEditorViewAction.PREVIOUS.setEnabled(isEnabled);
 		ReviewEditorViewAction.SAVE.setEnabled(isEnabled);
-		ReviewEditorViewAction.CLEAR.setEnabled(isEnabled);
+		ReviewEditorViewAction.clearAction.setEnabled(isEnabled);
 	}
 
 	/**

@@ -55,7 +55,7 @@ import edu.hawaii.ics.csdl.jupiter.ui.menu.ReviewFileSelectionMenu;
 import edu.hawaii.ics.csdl.jupiter.ui.preference.FilterPreferencePage;
 import edu.hawaii.ics.csdl.jupiter.ui.property.ReviewPropertyPage;
 import edu.hawaii.ics.csdl.jupiter.ui.view.editor.ReviewEditorView;
-import edu.hawaii.ics.csdl.jupiter.ui.view.editor.ReviewEditorViewAction;
+import edu.hawaii.ics.csdl.jupiter.ui.view.editor.ReviewEditorActionContainer;
 import edu.hawaii.ics.csdl.jupiter.util.JupiterLogger;
 import edu.hawaii.ics.csdl.jupiter.util.ReviewDialog;
 
@@ -394,7 +394,7 @@ public class ReviewTableViewAction {
 					} catch (ReviewException e) {
 						return;
 					}
-					ReviewEditorViewAction.updateNextPreviousIcon();
+					ReviewEditorActionContainer.updateIcons();
 					int type = ReviewEvent.TYPE_COMMAND;
 					int kind = ReviewEvent.KIND_EDIT;
 					ReviewPluginImpl.getInstance().notifyListeners(type, kind);
@@ -448,7 +448,7 @@ public class ReviewTableViewAction {
 						}
 					}
 				}
-				ReviewEditorViewAction.updateNextPreviousIcon();
+				ReviewEditorActionContainer.updateIcons();
 			}
 		};
 		ADD = new Action() {

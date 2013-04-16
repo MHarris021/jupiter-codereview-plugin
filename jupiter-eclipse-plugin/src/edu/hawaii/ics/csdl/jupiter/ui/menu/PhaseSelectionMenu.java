@@ -10,6 +10,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.TableItem;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import edu.hawaii.ics.csdl.jupiter.ReviewException;
 import edu.hawaii.ics.csdl.jupiter.ReviewI18n;
@@ -44,17 +45,24 @@ import edu.hawaii.ics.csdl.jupiter.util.ReviewDialog;
  * @version $Id: PhaseSelectionMenu.java 84 2008-03-07 10:11:27Z jsakuda $
  */
 public class PhaseSelectionMenu {
-	/** Jupiter logger */
-	private static JupiterLogger log = JupiterLogger.getLogger();
 
+	@Autowired
 	private FileResource fileResource;
+
+	@Autowired
 	private PreferenceResource preferenceResource;
 
+	@Autowired
 	private PropertyResource propertyResource;
 
+	@Autowired
 	private ReviewModel reviewModel;
 
+	@Autowired
 	private ReviewIssueModelManager reviewIssueModelManager;
+
+	public PhaseSelectionMenu() {
+	}
 
 	public PhaseSelectionMenu(FileResource fileResource,
 			PreferenceResource preferenceResource,
@@ -177,7 +185,7 @@ public class PhaseSelectionMenu {
 		// set the selected review phase name key int review model.
 		reviewModel.notifyListeners(reviewPhaseNameKey);
 
-		IProject project = FileResource.getActiveProject();
+		IProject project = fileResource.getActiveProject();
 		// assertion project should not be null.
 		if (project == null) {
 			String[] projects = fileResource
@@ -218,7 +226,6 @@ public class PhaseSelectionMenu {
 			String mKey = "ReviewDialog.noReviewFileDetermined.simpleConfirm.messageDialog.message";
 			String message = ReviewI18n.getString(mKey);
 			ReviewDialog.openSimpleComfirmMessageDialog(title, message);
-			log.debug(message);
 			return false;
 		}
 
@@ -317,7 +324,7 @@ public class PhaseSelectionMenu {
 	public boolean doUpdateMenuCommand(String reviewPhaseNameKey) {
 		// set the selected review phase name key into review model.
 		reviewModel.notifyListeners(reviewPhaseNameKey);
-		IProject project = FileResource.getActiveProject();
+		IProject project = fileResource.getActiveProject();
 		// assertion project should not be null.
 		if (project == null) {
 			String[] projects = fileResource
@@ -359,7 +366,6 @@ public class PhaseSelectionMenu {
 			String messageKey = "ReviewDialog.noReviewFileDetermined.simpleConfirm.messageDialog.message";
 			String message = ReviewI18n.getString(messageKey);
 			ReviewDialog.openSimpleComfirmMessageDialog(title, message);
-			log.debug(message);
 			return false;
 		}
 		// check file written permission
@@ -379,7 +385,6 @@ public class PhaseSelectionMenu {
 
 		ReviewIssueModel reviewIssueModel = reviewIssueModelManager
 				.createReviewIssueModel(project, reviewId);
-		log.debug("review issue model size: " + reviewIssueModel.size());
 		reviewIssueModel.notifyListeners(ReviewIssueModelEvent.MERGE);
 
 		ColumnDataModelManager columnDataModelManager = new ColumnDataModelManager(
@@ -393,7 +398,6 @@ public class PhaseSelectionMenu {
 		iReviewFile = fileResource.getReviewFile(project, reviewId, reviewerId);
 		// null happens when the view is not opened yet after Eclipse startup.
 		if (view == null) {
-			log.debug("view is null");
 			view = ReviewTableView.bringViewToTop();
 		}
 		view.createColumns(columnDataModel);
@@ -426,7 +430,6 @@ public class PhaseSelectionMenu {
 			}
 			editorView.bringTagToTop(reviewPhaseNameKey);
 		} catch (ReviewException e) {
-			log.debug(e.getMessage());
 			return false;
 		}
 		return true;

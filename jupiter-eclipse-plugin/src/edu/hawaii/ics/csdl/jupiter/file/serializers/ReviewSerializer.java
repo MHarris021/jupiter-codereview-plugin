@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
-import javax.xml.stream.XMLStreamException;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -16,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import edu.hawaii.ics.csdl.jupiter.ReviewException;
 import edu.hawaii.ics.csdl.jupiter.file.review.Review;
+import edu.hawaii.ics.csdl.jupiter.file.util.ReviewFileStructureUtils;
 import edu.hawaii.ics.csdl.jupiter.file.util.ReviewBuilder;
 import edu.hawaii.ics.csdl.jupiter.file.util.ReviewIssueBuilder;
 import edu.hawaii.ics.csdl.jupiter.file.util.ReviewModelResolver;
@@ -23,7 +23,6 @@ import edu.hawaii.ics.csdl.jupiter.model.review.ReviewId;
 import edu.hawaii.ics.csdl.jupiter.model.review.ReviewModel;
 import edu.hawaii.ics.csdl.jupiter.model.reviewissue.ReviewIssue;
 import edu.hawaii.ics.csdl.jupiter.model.reviewissue.ReviewIssueModel;
-import edu.hawaii.ics.csdl.jupiter.util.JupiterLogger;
 
 /**
  * @author Takuya Yamashita
@@ -32,8 +31,6 @@ import edu.hawaii.ics.csdl.jupiter.util.JupiterLogger;
  */
 @Component
 public class ReviewSerializer implements ISerializer<Review> {
-	/** Jupiter logger */
-	public static JupiterLogger log = JupiterLogger.getLogger();
 
 	/** The date format pattern string. */
 	public static final String DATE_FORMAT_PATTERN = "yyyy-MM-dd :: HH:mm:ss:SSS z";
@@ -70,19 +67,16 @@ public class ReviewSerializer implements ISerializer<Review> {
 	 *            The output XML file with absolute path.
 	 * @param iFile
 	 *            The iFile instance for the review file.
+	 * @throws SerializerException
 	 * 
-	 * @throws IOException
-	 *             if problems occur.
-	 * @throws XMLStreamException
-	 *             Thrown if there are errors writing the review to file.
 	 */
 	public void write(ReviewId reviewId, ReviewIssueModel model, File xmlFile,
-			IFile iFile) throws IOException, XMLStreamException {
+			IFile iFile) throws SerializerException {
 		write(reviewId, model, xmlFile);
 		try {
 			iFile.refreshLocal(IResource.DEPTH_ZERO, null);
-		} catch (CoreException e) {
-			log.debug("Cannot refresh review file " + xmlFile.getAbsolutePath());
+		} catch (Exception e) {
+			throw new SerializerException("Could not write review: ", e);
 		}
 	}
 
@@ -103,66 +97,27 @@ public class ReviewSerializer implements ISerializer<Review> {
 	 * @param xmlFile
 	 *            The output XML file with absolute path.
 	 * 
-	 * @throws IOException
-	 *             if problems occur.
-	 * @throws XMLStreamException
-	 *             Thrown if there are errors writing the review to file.
 	 */
 	public void write(ReviewId reviewId, ReviewIssueModel model, File xmlFile)
-			throws IOException, XMLStreamException {
+			throws SerializerException {
 		if (model == null) {
-			log.debug("Model is null.");
 			throw new IllegalArgumentException(
 					"ReviewIssueModel instance is null.");
 		}
-		verifyFileStructure(reviewId, xmlFile);
+		if (!ReviewFileStructureUtils.verify(xmlFile)) {
+			try {
+				ReviewFileStructureUtils.create(xmlFile, reviewId);
+			} catch (IOException e) {
+				throw new SerializerException("Could not create review file: "
+						+ xmlFile.getPath(), e);
+			}
+		}
 
 		Review review = ReviewBuilder.createReviewFromModel(reviewId, model,
 				xmlFile);
 
-		log.debug("writing " + xmlFile + " ...");
-		try {
-			iReviewSerializer.serialize(review, xmlFile);
-		} catch (SerializerException e) {
-			log.error(e);
-		}
-	}
+		iReviewSerializer.serialize(review, xmlFile);
 
-	public void verifyFileStructure(ReviewId reviewId, File xmlFile)
-			throws IOException {
-		if (xmlFile == null) {
-			log.debug("XML file instance is null.");
-			throw new IllegalArgumentException("File instance is null.");
-		}
-
-		// if outputFile does not exit, create them.
-		if (!xmlFile.getParentFile().exists()) {
-			try {
-				xmlFile.getParentFile().mkdirs();
-			} catch (SecurityException e) {
-				// show can-not-create directory message.
-				log.debug(e.getMessage());
-				throw new SecurityException(e.getMessage());
-			}
-		}
-		if (!xmlFile.exists()) {
-			try {
-				xmlFile.createNewFile();
-			} catch (SecurityException e) {
-				log.debug(e.getMessage());
-				throw new SecurityException(e.getMessage());
-			}
-		}
-		if (!xmlFile.canWrite()) {
-			// show can-not-write message in a file.
-			log.debug(xmlFile + " can not be written");
-			throw new RuntimeException(xmlFile
-					+ " is not writable to record review issue. "
-					+ "Please make it writable before proceed. Issue from "
-					+ reviewId.getAuthor() + reviewId.getAuthor()
-					+ " with message \"" + reviewId.getDescription()
-					+ "\" is not saved.");
-		}
 	}
 
 	/**
@@ -174,19 +129,19 @@ public class ReviewSerializer implements ISerializer<Review> {
 	 *             if problems occur during writing process.
 	 * @throws IOException
 	 */
-	public void writeEmptyCodeReview(File xmlFile) throws ReviewException,
-			IOException {
-		verifyFileStructure(null, xmlFile);
+	public void writeEmptyCodeReview(File xmlFile) throws SerializerException {
 		Review review = new Review();
 		ReviewModel reviewModel = new ReviewModel();
 		ReviewId reviewId = reviewModel.getReviewIdManager().getReviewId();
-		review.setId(reviewId.getReviewId());
-
 		try {
-			iReviewSerializer.serialize(review, xmlFile);
-		} catch (SerializerException e) {
-			throw new ReviewException("IOException: " + e.getMessage());
+			ReviewFileStructureUtils.create(xmlFile, reviewId);
+		} catch (IOException e) {
+			throw new SerializerException("Could not create review file: "
+					+ xmlFile.getPath(), e);
 		}
+
+		review.setId(reviewId.getReviewId());
+		iReviewSerializer.serialize(review, xmlFile);
 	}
 
 	/**
@@ -206,86 +161,59 @@ public class ReviewSerializer implements ISerializer<Review> {
 	 *            path.
 	 * @return <code>true</code> if all files are successfully read.
 	 *         <code>false</code> if there is a file to be unread.
+	 * @throws SerializerException
 	 */
 	public boolean read(ReviewId reviewId, ReviewIssueModel model,
-			IFile[] iFiles) {
+			IFile[] iFiles) throws SerializerException {
 		if (reviewId == null || model == null || iFiles == null) {
 			throw new IllegalArgumentException(
 					"ReviewId, ReviewIssueModel, or IFile[] is null");
 		}
 
-		boolean isSuccessIterationForAll = true;
+		boolean isSuccessIterationForAll = false;
 		ReviewModel reviewModel = new ReviewModel();
 		ReviewModelResolver reviewModelResolver = new ReviewModelResolver(
 				reviewModel);
 
-		for (int i = 0; i < iFiles.length; i++) {
-			log.debug("reading " + iFiles[i].getLocation() + " ...");
-			File xmlFile = new File(iFiles[i].getLocation().toString());
+		for (IFile iFile : iFiles) {
+			File xmlFile = new File(iFile.getLocation().toString());
 			Review review = null;
-			try {
-				review = deserialize(xmlFile);
-			} catch (Exception e) {
-				log.error(e);
-				isSuccessIterationForAll = false;
-				continue;
-			}
-
+			review = deserialize(xmlFile);
 			String reviewIdName = review.getId();
 			if (reviewIdName != null
 					&& reviewIdName.equals(reviewId.getReviewId())) {
-				boolean isSuccessIterationForFile = true;
 
-				List<edu.hawaii.ics.csdl.jupiter.file.review.ReviewIssue> xmlReviewIssues = review
-						.getReviewIssues();
-				List<ReviewIssue> tempCodeReviewList = new ArrayList<ReviewIssue>();
-				for (edu.hawaii.ics.csdl.jupiter.file.review.ReviewIssue xmlReviewIssue : xmlReviewIssues) {
-					try {
-						ReviewIssue reviewIssue = ReviewIssueBuilder
-								.createReviewIssue(xmlReviewIssue, iFiles[i],
-										reviewModelResolver);
-						tempCodeReviewList.add(reviewIssue);
-					} catch (ReviewException e) {
-						log.error(e);
-						isSuccessIterationForFile = false;
-						isSuccessIterationForAll = false;
-						break;
-					}
-				}
-				// adds the list to the model only when the iteration of the
-				// file succeed.
-				if (isSuccessIterationForFile) {
+				List<ReviewIssue> tempCodeReviewList = createReviewIssues(
+						review, iFile, reviewModelResolver);
+				if (!tempCodeReviewList.isEmpty()) {
 					model.addAll(tempCodeReviewList);
 				}
 			}
 		}
+		isSuccessIterationForAll = true;
 		return isSuccessIterationForAll;
 	}
 
-	/**
-	 * Checks if the passing <code>File</code> instance is associated with
-	 * <code>String</code> review ID.
-	 * 
-	 * @param reviewId
-	 *            the review ID.
-	 * @param reviewFile
-	 *            the review file to be checked.
-	 * @return <code>true</code> if the code>File</code> instance is associated
-	 *         with <code>String</code>.
-	 * @throws ReviewException
-	 *             if problems occur during file reading process.
-	 */
-	public boolean isReviewIdAssociatedFile(String reviewId, File reviewFile)
-			throws ReviewException {
-		Review review;
-		try {
-			review = iReviewSerializer.deserialize(reviewFile);
-		} catch (SerializerException e) {
-			throw new ReviewException(e.getMessage(), e);
+	private List<ReviewIssue> createReviewIssues(
+			edu.hawaii.ics.csdl.jupiter.file.review.Review reviewFile,
+			IFile iFile, ReviewModelResolver reviewModelResolver) {
+		List<edu.hawaii.ics.csdl.jupiter.file.review.ReviewIssue> xmlReviewIssues = reviewFile
+				.getReviewIssues();
+
+		List<ReviewIssue> reviewIssues = new ArrayList<ReviewIssue>(
+				xmlReviewIssues.size());
+		for (edu.hawaii.ics.csdl.jupiter.file.review.ReviewIssue xmlReviewIssue : xmlReviewIssues) {
+			try {
+				ReviewIssue reviewIssue = ReviewIssueBuilder.createReviewIssue(
+						xmlReviewIssue, iFile, reviewModelResolver);
+				reviewIssues.add(reviewIssue);
+			} catch (ReviewException e) {
+				reviewIssues.clear();
+				break;
+			}
 		}
 
-		String reviewIdName = review.getId();
-		return (reviewIdName != null && reviewIdName.equals(reviewId));
+		return reviewIssues;
 	}
 
 	/**
@@ -296,7 +224,7 @@ public class ReviewSerializer implements ISerializer<Review> {
 	 * @throws ReviewException
 	 *             if problems occur during the file deletion.
 	 */
-	public void remove(IFile[] iFiles) throws ReviewException {
+	public static void remove(IFile[] iFiles) throws ReviewException {
 		for (int i = 0; i < iFiles.length; i++) {
 			try {
 				iFiles[i].delete(true, false, null);

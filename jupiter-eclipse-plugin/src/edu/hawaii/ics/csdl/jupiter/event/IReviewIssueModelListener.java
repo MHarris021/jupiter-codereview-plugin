@@ -16,6 +16,7 @@ public interface IReviewIssueModelListener {
    * Called when a notifier notifies to this listener. <code>ReviewIssueModelEvent</code>
    * instance contains the event type such as <code>ReviewIssueModelEvent.ADD</code>, etc.
    * @param event the codeReview event to be notified.
+ * @throws ReviewIssueModelException 
    */
-  void reviewIssueModelChanged(ReviewIssueModelEvent event);
+  void reviewIssueModelChanged(ReviewIssueModelEvent event) throws ReviewIssueModelException;
 }

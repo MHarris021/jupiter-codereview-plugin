@@ -15,7 +15,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.ui.IEditorInput;
@@ -26,10 +25,14 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.texteditor.ITextEditor;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import edu.hawaii.ics.csdl.jupiter.ReviewException;
 import edu.hawaii.ics.csdl.jupiter.ReviewPluginImpl;
 import edu.hawaii.ics.csdl.jupiter.file.serializers.ReviewSerializer;
+import edu.hawaii.ics.csdl.jupiter.file.serializers.SerializerException;
+import edu.hawaii.ics.csdl.jupiter.file.util.ReviewFileStructureUtils;
+import edu.hawaii.ics.csdl.jupiter.file.util.ReviewUtils;
 import edu.hawaii.ics.csdl.jupiter.model.review.ReviewId;
 import edu.hawaii.ics.csdl.jupiter.model.review.ReviewerId;
 import edu.hawaii.ics.csdl.jupiter.util.JupiterLogger;
@@ -41,14 +44,18 @@ import edu.hawaii.ics.csdl.jupiter.util.JupiterLogger;
  * @version $Id: FileResource.java 171 2009-10-12 01:43:58Z jsakuda $
  */
 public class FileResource {
-	/** Jupiter logger */
-	private static JupiterLogger log = JupiterLogger.getLogger();
 
 	/** The active resource. */
-	private static IResource selectedResource;
+	private IResource selectedResource;
+
+	@Autowired
 	private ReviewSerializer serializer;
 
+	@Autowired
 	private PropertyResource propertyResource;
+
+	public FileResource() {
+	}
 
 	public FileResource(ReviewSerializer serializer,
 			PropertyResource propertyResource) {
@@ -62,7 +69,7 @@ public class FileResource {
 	 * @param resource
 	 *            the active resource.
 	 */
-	public static void setSelectedResource(IResource resource) {
+	public void setSelectedResource(IResource resource) {
 		selectedResource = resource;
 	}
 
@@ -86,10 +93,11 @@ public class FileResource {
 	 *             thrown if problems occur.
 	 * @throws ReviewException
 	 *             thrown if problems occur.
+	 * @throws SerializerException
 	 */
 	public IFile createIFile(IProject project, String relativePath,
 			boolean isReviewFile) throws IOException, CoreException,
-			ReviewException {
+			ReviewException, SerializerException {
 		if (project == null) {
 			return null;
 		}
@@ -114,36 +122,26 @@ public class FileResource {
 	 *             if problems occur.
 	 * @throws ReviewException
 	 *             if problems occur.
+	 * @throws SerializerException
 	 */
 	public IFile createIFile(IFile iFile, boolean isReviewFile)
-			throws IOException, CoreException, ReviewException {
+			throws IOException, CoreException, ReviewException,
+			SerializerException {
 		File file = iFile.getLocation().toFile();
 		if (iFile.exists()) {
 			if (!file.exists()) {
-				// Makes sure the parent directories of the review file are
-				// created.
-				file.getParentFile().mkdirs();
-				file.createNewFile();
+				ReviewFileStructureUtils.create(file, null);
 				iFile.refreshLocal(IResource.DEPTH_ONE, null);
 				iFile.setContents(new FileInputStream(file), true, false, null);
-				// Writes root XML elements. Otherwise the
-				// org.jdom.input.JDOMParseException exception
-				// will be thrown when the XML file is read.
 				if (isReviewFile) {
 					serializer.writeEmptyCodeReview(file);
 				}
 			}
 		} else {
 			if (!file.exists()) {
-				// makes sure the parent directories of the review file are
-				// created.
-				file.getParentFile().mkdirs();
-				file.createNewFile();
+				ReviewFileStructureUtils.create(file, null);
 				iFile.refreshLocal(IResource.DEPTH_ONE, null);
 				iFile.setContents(new FileInputStream(file), true, false, null);
-				// Writes root XML elements. Otherwise the
-				// org.jdom.input.JDOMParseException exception
-				// will be thrown when the XML file is read.
 				if (isReviewFile) {
 					serializer.writeEmptyCodeReview(file);
 				}
@@ -255,7 +253,7 @@ public class FileResource {
 	 * 
 	 * @return the selected <code>IProject</code> instance
 	 */
-	public static IProject getSelectedProject() {
+	public IProject getSelectedProject() {
 		return selectedResource.getProject();
 	}
 
@@ -271,7 +269,7 @@ public class FileResource {
 	 *         instance does not exist (meaning the case that welcome page is
 	 *         opened, for example).
 	 */
-	public static IProject getActiveProject() {
+	public IProject getActiveProject() {
 		if (selectedResource != null) {
 			return selectedResource.getProject();
 		} else {
@@ -325,7 +323,7 @@ public class FileResource {
 	 *         <code>IFileEditorInput</code> instance does not exist (i.e the
 	 *         case that welcome page is opened, for example).
 	 */
-	public static IFile getSelectedIFile() {
+	public IFile getSelectedIFile() {
 		// if active editor is not opened, but users click the file in the
 		// package explore, for example.
 		if (selectedResource != null && selectedResource instanceof IFile) {
@@ -351,14 +349,7 @@ public class FileResource {
 				if (part != null) {
 					IEditorInput editorInput = part.getEditorInput();
 					if (editorInput instanceof IFileEditorInput) {
-						try {
-							return ((IFileEditorInput) editorInput).getFile();
-						}
-						// This happens when the welcome page is opened at the
-						// beginning.
-						catch (ClassCastException e) {
-							log.debug(e.getMessage());
-						}
+						return ((IFileEditorInput) editorInput).getFile();
 					}
 				}
 			}
@@ -376,10 +367,10 @@ public class FileResource {
 	 *            the review ID instance which is associated with the files.
 	 * @return the set of the review <code>IFile</code> instances associated
 	 *         with the review ID in the project.
+	 * @throws SerializerException
 	 */
-	public IFile[] getReviewIFiles(IProject project, ReviewId reviewId) {
-		IPreferenceStore store = ReviewPluginImpl.getInstance()
-				.getPreferenceStore();
+	public IFile[] getReviewIFiles(IProject project, ReviewId reviewId)
+			throws SerializerException {
 		String relativePath = reviewId.getDirectory();
 		List<IFile> filesList = new ArrayList<IFile>();
 		// Gathers all review File instances among all opened projects.
@@ -387,15 +378,10 @@ public class FileResource {
 		if (folder.exists() && folder.isDirectory()) {
 			File[] files = folder.listFiles(new ReviewFileFilter());
 			for (File file : files) {
-				try {
-					if (serializer.isReviewIdAssociatedFile(
-							reviewId.getReviewId(), file)) {
-						IFile iFile = project.getFile(relativePath + "/"
-								+ file.getName());
-						filesList.add(iFile);
-					}
-				} catch (ReviewException e) {
-					log.error(e);
+				if (ReviewUtils.isReviewIdAssociatedwithFile(reviewId, file)) {
+					IFile iFile = project.getFile(relativePath + "/"
+							+ file.getName());
+					filesList.add(iFile);
 				}
 			}
 		}
@@ -449,7 +435,7 @@ public class FileResource {
 	 * @param lineNumber
 	 *            the line number of the target file.
 	 */
-	public static void goToLine(IFile targetIFile, int lineNumber) {
+	public void goToLine(IFile targetIFile, int lineNumber) {
 		if (targetIFile == null || targetIFile.equals("")) {
 			return;
 		}
@@ -486,9 +472,8 @@ public class FileResource {
 				textEditor.selectAndReveal(lineInformation.getOffset(), 0);
 			}
 		} catch (Exception e) {
-			log.debug(e.getMessage());
 		}
-		// ReviewMarker.updateMarkers(targetIFile);
+
 	}
 
 	/**
@@ -501,7 +486,7 @@ public class FileResource {
 	 */
 	public boolean remove(IFile[] iFiles) {
 		try {
-			serializer.remove(iFiles);
+			ReviewSerializer.remove(iFiles);
 			return true;
 		} catch (ReviewException e) {
 			return false;

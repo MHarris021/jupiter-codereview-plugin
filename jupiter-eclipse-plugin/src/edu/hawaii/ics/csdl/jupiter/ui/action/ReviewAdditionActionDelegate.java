@@ -5,7 +5,6 @@ import java.util.Date;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -13,9 +12,11 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.IEditorActionDelegate;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import edu.hawaii.ics.csdl.jupiter.ReviewException;
 import edu.hawaii.ics.csdl.jupiter.ReviewI18n;
@@ -43,10 +44,9 @@ import edu.hawaii.ics.csdl.jupiter.model.reviewissue.StatusKeyManager;
 import edu.hawaii.ics.csdl.jupiter.model.reviewissue.Type;
 import edu.hawaii.ics.csdl.jupiter.model.reviewissue.TypeKeyManager;
 import edu.hawaii.ics.csdl.jupiter.ui.view.editor.ReviewEditorView;
-import edu.hawaii.ics.csdl.jupiter.ui.view.editor.ReviewEditorViewAction;
+import edu.hawaii.ics.csdl.jupiter.ui.view.editor.ReviewEditorActionContainer;
 import edu.hawaii.ics.csdl.jupiter.ui.view.table.FilterPhase;
 import edu.hawaii.ics.csdl.jupiter.ui.view.table.ReviewTableView;
-import edu.hawaii.ics.csdl.jupiter.util.JupiterLogger;
 import edu.hawaii.ics.csdl.jupiter.util.ReviewDialog;
 
 /**
@@ -60,8 +60,6 @@ import edu.hawaii.ics.csdl.jupiter.util.ReviewDialog;
  */
 public class ReviewAdditionActionDelegate implements IEditorActionDelegate,
 		IWorkbenchWindowActionDelegate {
-	/** Jupiter logger */
-	private static JupiterLogger log = JupiterLogger.getLogger();
 
 	/** The target file path from a project */
 	private String targetFilePath = "";
@@ -69,16 +67,27 @@ public class ReviewAdditionActionDelegate implements IEditorActionDelegate,
 	private String lineNumber = "";
 	/** The selectedText when code review action is invoked. */
 	private String selectedText = "";
-	private ITextSelection texSelection;
-
+	
+	@Autowired
 	private FileResource fileResource;
+
+	@Autowired
 	private PreferenceResource preferenceResource;
 
+	@Autowired
 	private PropertyResource propertyResource;
 
+	@Autowired
 	private ReviewModel reviewModel;
 
+	@Autowired
 	private ReviewIssueModelManager reviewIssueModelManager;
+	
+	@Autowired
+	private IWorkbench workbench;
+
+	public ReviewAdditionActionDelegate() {
+	}
 
 	public ReviewAdditionActionDelegate(FileResource fileResource,
 			PreferenceResource preferenceResource,
@@ -103,7 +112,7 @@ public class ReviewAdditionActionDelegate implements IEditorActionDelegate,
 		if (!isDetermined) {
 			return;
 		}
-		IFile selectedFile = FileResource.getSelectedIFile();
+		IFile selectedFile = fileResource.getSelectedIFile();
 		this.targetFilePath = (selectedFile != null) ? selectedFile
 				.getProjectRelativePath().toString() : "";
 
@@ -120,7 +129,6 @@ public class ReviewAdditionActionDelegate implements IEditorActionDelegate,
 			String messageKey = "ReviewDialog.noReviewFileDetermined.simpleConfirm.messageDialog.message";
 			String message = ReviewI18n.getString(messageKey);
 			ReviewDialog.openSimpleComfirmMessageDialog(title, message);
-			log.debug(message);
 			return;
 		}
 		// check file written permission
@@ -161,8 +169,8 @@ public class ReviewAdditionActionDelegate implements IEditorActionDelegate,
 								.getInstance(project, reviewId).getDefault(),
 						iReviewFile);
 				reviewIssue.setLinked(true);
-				ReviewEditorViewAction.NEXT.setEnabled(false);
-				ReviewEditorViewAction.PREVIOUS.setEnabled(false);
+				ReviewEditorActionContainer.nextAction.setEnabled(false);
+				ReviewEditorActionContainer.previousAction.setEnabled(false);
 				editorView.setReviewIssue(reviewIssue);
 			} else {
 				editorView.setNewEmptyReviewIssue(iReviewFile);
@@ -171,7 +179,6 @@ public class ReviewAdditionActionDelegate implements IEditorActionDelegate,
 			editorView.setFocus();
 		} catch (ReviewException e) {
 			e.printStackTrace();
-			log.debug(e.getMessage());
 		}
 		int type = ReviewEvent.TYPE_COMMAND;
 		int kind = ReviewEvent.KIND_ADD;
@@ -188,7 +195,7 @@ public class ReviewAdditionActionDelegate implements IEditorActionDelegate,
 	 */
 	public boolean determineProjectReviewIdReviewerId() {
 		boolean isReviewSelectionWizardInvoked = false;
-		IProject project = FileResource.getActiveProject();
+		IProject project = fileResource.getActiveProject();
 		// assertion project should not be null.
 		if (project == null) {
 			ReviewDialog.processNonProjectSelectionDialog();
@@ -230,8 +237,6 @@ public class ReviewAdditionActionDelegate implements IEditorActionDelegate,
 			return false;
 		}
 
-		ReviewPluginImpl plugin = ReviewPluginImpl.getInstance();
-		IPreferenceStore store = plugin.getPreferenceStore();
 		if (isReviewSelectionWizardInvoked) {
 			ReviewIssueModel reviewIssueModel = reviewIssueModelManager
 					.createReviewIssueModel(project, reviewId);
@@ -270,11 +275,10 @@ public class ReviewAdditionActionDelegate implements IEditorActionDelegate,
 	 * @return the line number of the active file if any.
 	 */
 	public String getLineNumber() {
-		ReviewPluginImpl plugin = ReviewPluginImpl.getInstance();
-		IWorkbenchWindow window = plugin.getWorkbench()
+		IWorkbenchWindow workbenchWindow = workbench
 				.getActiveWorkbenchWindow();
-		if (window != null) {
-			IWorkbenchPage page = window.getActivePage();
+		if (workbenchWindow != null) {
+			IWorkbenchPage page = workbenchWindow.getActivePage();
 			IEditorPart activeEditorPart = page.getActiveEditor();
 			if (activeEditorPart != null) {
 				IEditorSite editorSite = page.getActiveEditor().getEditorSite();
@@ -301,9 +305,8 @@ public class ReviewAdditionActionDelegate implements IEditorActionDelegate,
 	 * @return <code>true</code> if the active editor belongs to the current
 	 *         project. <code>false</code> otherwise.
 	 */
-	private static boolean isActiveEditorInCurrentProject(
-			IProject currentProject) {
-		return (currentProject.getName().equals(FileResource.getActiveProject()
+	private boolean isActiveEditorInCurrentProject(IProject currentProject) {
+		return (currentProject.getName().equals(fileResource.getActiveProject()
 				.getName()));
 	}
 
@@ -319,11 +322,10 @@ public class ReviewAdditionActionDelegate implements IEditorActionDelegate,
 	public void selectionChanged(IAction action, ISelection selection) {
 		if (selection instanceof ITextSelection) {
 			ITextSelection textSelection = (ITextSelection) selection;
-			this.texSelection = textSelection;
 			this.lineNumber = String.valueOf(textSelection.getStartLine() + 1);
 			this.selectedText = textSelection.getText();
 		}
-		IFile selectedFile = FileResource.getSelectedIFile();
+		IFile selectedFile = fileResource.getSelectedIFile();
 		this.targetFilePath = (selectedFile != null) ? selectedFile
 				.getProjectRelativePath().toString() : "";
 	}

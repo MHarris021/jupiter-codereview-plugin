@@ -1,29 +1,21 @@
 package edu.hawaii.ics.csdl.jupiter.file.serializers;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 
 import javax.annotation.Resource;
-import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import edu.hawaii.ics.csdl.jupiter.ReviewException;
-import edu.hawaii.ics.csdl.jupiter.ReviewPlugin;
-import edu.hawaii.ics.csdl.jupiter.ReviewPluginImpl;
 import edu.hawaii.ics.csdl.jupiter.file.FileResource;
 import edu.hawaii.ics.csdl.jupiter.file.property.Property;
 import edu.hawaii.ics.csdl.jupiter.file.property.Review;
-import edu.hawaii.ics.csdl.jupiter.util.JupiterLogger;
 
 /**
  * Provides an utility for property config XML.
@@ -33,26 +25,25 @@ import edu.hawaii.ics.csdl.jupiter.util.JupiterLogger;
  */
 @Component
 public class PropertySerializer implements ISerializer<Property> {
-	/** Jupiter logger */
-	private static JupiterLogger log = JupiterLogger.getLogger();
-
 	private static final String DEFAULT_PROPERTY_XML_FILE = "property.xml";
 	/** The property XML file name. */
 	public static final String PROPERTY_XML_FILE = ".jupiter";
 
 	@Resource
 	private ISerializer<Property> iPropertySerializer;
+
+	@Resource
+	private URL pluginInstallUrl;
 	
 	@Autowired
-	private ReviewPlugin plugin;
+	private FileResource fileResource;
 
 	public PropertySerializer() {
 	}
-	
+
 	/**
 	 * Prohibits instantiation.
 	 * 
-	 * @throws JAXBException
 	 */
 	public PropertySerializer(ISerializer<Property> serializer) {
 
@@ -66,25 +57,22 @@ public class PropertySerializer implements ISerializer<Property> {
 	 * @param project
 	 *            the project
 	 * @return the new <code>Property</code> instance.
-	 * @throws ReviewException
-	 *             if an error occurs during the new document creation.
 	 * @throws SerializerException
 	 */
-	public Property newProperty(IProject project) throws ReviewException,
-			SerializerException {
+	public Property newProperty(IProject project) throws SerializerException {
 		IFile jupiterConfigIFile = project.getFile(PROPERTY_XML_FILE);
 		File jupiterConfigFile = jupiterConfigIFile.getLocation().toFile();
 		Property property = null;
 		if (!jupiterConfigFile.exists()) {
-			if (FileResource.getActiveProject().getName()
+			if (fileResource.getActiveProject().getName()
 					.equals(project.getName())) {
 				try {
 					jupiterConfigFile = copyDefaultConfigFileTo(jupiterConfigFile);
 					jupiterConfigIFile.refreshLocal(IResource.DEPTH_ONE, null);
-				} catch (CoreException e) {
-					log.error(e);
-				} catch (IOException e) {
-					log.error(e);
+				} catch (Exception e) {
+					throw new SerializerException(
+							"Could not create Property Object: ", e);
+
 				}
 			}
 		}
@@ -120,19 +108,21 @@ public class PropertySerializer implements ISerializer<Property> {
 	 * @param outputPropertyFile
 	 *            the output property file.
 	 * @return the config file <code>File</code> instance.
-	 * @throws IOException
-	 *             if problems occur.
-	 * @throws CoreException
-	 *             if problems occur.
 	 */
 	public File copyDefaultConfigFileTo(File outputPropertyFile)
-			throws IOException, CoreException {
-		URL pluginUrl = plugin.getInstallURL();
-		URL xmlUrl = FileLocator.toFileURL(new URL(pluginUrl,
-				DEFAULT_PROPERTY_XML_FILE));
+			throws SerializerException {
+		URL pluginUrl = pluginInstallUrl;
+		URL xmlUrl;
+		try {
+			xmlUrl = FileLocator.toFileURL(new URL(pluginUrl,
+					DEFAULT_PROPERTY_XML_FILE));
+			File sourceXmlFile = FileUtils.toFile(xmlUrl);
+			FileUtils.copyFile(sourceXmlFile, outputPropertyFile);
+		} catch (Exception e) {
+			throw new SerializerException(
+					"Could not copy the default configuration", e);
+		}
 
-		File sourceXmlFile = new File(xmlUrl.getFile());
-		FileUtils.copyFile(sourceXmlFile, outputPropertyFile);
 		return outputPropertyFile;
 	}
 
@@ -143,22 +133,21 @@ public class PropertySerializer implements ISerializer<Property> {
 	 * @throws SerializerException
 	 */
 	public Review cloneDefaultReview() throws SerializerException {
-		URL pluginUrl = ReviewPluginImpl.getInstance().getInstallURL();
+		URL pluginUrl = pluginInstallUrl;
 
 		Review review = null;
+		URL xmlUrl = null;
 		try {
-			URL xmlUrl = FileLocator.toFileURL(new URL(pluginUrl,
+			xmlUrl = FileLocator.toFileURL(new URL(pluginUrl,
 					DEFAULT_PROPERTY_XML_FILE));
-
-			File file = new File(xmlUrl.toURI());
-			Property property = deserialize(file);
-			// there should only be the default review in the list
-			review = property.getReviews().get(0);
-		} catch (IOException e) {
-			log.error(e);
-		} catch (URISyntaxException e) {
-			log.error(e);
+		} catch (Exception e) {
+			throw new SerializerException(
+					"Could not copy the default review: ", e);
 		}
+
+		File file = FileUtils.toFile(xmlUrl);
+		Property property = deserialize(file);
+		review = property.getReviews().get(0);
 		return review;
 	}
 }

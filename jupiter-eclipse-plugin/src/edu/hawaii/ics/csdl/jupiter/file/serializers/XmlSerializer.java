@@ -6,11 +6,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-
 
 public class XmlSerializer<T> extends AbstractXmlSerializer<T> implements
 		ISerializer<T> {
@@ -18,10 +18,18 @@ public class XmlSerializer<T> extends AbstractXmlSerializer<T> implements
 	private Marshaller marshaller;
 	private Unmarshaller unmarshaller;
 
-	public XmlSerializer(JAXBContext context) throws JAXBException {
-		setJaxbContext(context);
+	public XmlSerializer() {
+	}
+
+	@PostConstruct
+	protected void init() throws JAXBException {
 		createMarshaller(new HashMap<String, Object>());
 		createUnmarshaller(new HashMap<String, Object>());
+	}
+
+	public XmlSerializer(JAXBContext context) throws JAXBException {
+		setJaxbContext(context);
+
 	}
 
 	protected void createUnmarshaller(Map<String, Object> map)

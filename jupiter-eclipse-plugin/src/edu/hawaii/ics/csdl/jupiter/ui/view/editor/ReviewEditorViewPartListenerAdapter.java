@@ -60,7 +60,7 @@ class ReviewEditorViewPartListenerAdapter implements IPartListener {
   public void partDeactivated(IWorkbenchPart part) {
     if (part instanceof ReviewEditorView) {
       log.debug("part is deactviated.");
-      ReviewEditorViewAction.SAVE.run();
+      ReviewEditorActionContainer.SAVE.run();
     }
   }
 

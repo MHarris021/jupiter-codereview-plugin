@@ -5,10 +5,10 @@ import java.io.File;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import edu.hawaii.ics.csdl.jupiter.file.FileResource;
 import edu.hawaii.ics.csdl.jupiter.model.review.ReviewModel;
-import edu.hawaii.ics.csdl.jupiter.util.JupiterLogger;
 
 /**
  * Provides file event manager. Clients can get the latest event associated
@@ -18,9 +18,14 @@ import edu.hawaii.ics.csdl.jupiter.util.JupiterLogger;
  * @version $Id: EventFileManager.java 40 2007-05-30 00:24:50Z hongbing $
  */
 public class EventFileManager {
-	private JupiterLogger log = JupiterLogger.getLogger();
-	private String filePath = null;
+
+	private String filePath;
+
+	@Autowired
 	private ReviewModel reviewModel;
+
+	@Autowired
+	private FileResource fileResource;
 
 	/**
 	 * Prohibits clients from instantiating this.
@@ -38,7 +43,7 @@ public class EventFileManager {
 	 */
 	private String getSelectedFile() {
 		String file = "";
-		IFile selectedFile = FileResource.getSelectedIFile();
+		IFile selectedFile = fileResource.getSelectedIFile();
 		if (selectedFile != null) {
 			IPath selectedPath = selectedFile.getLocation();
 			if (selectedPath != null) {
@@ -73,7 +78,6 @@ public class EventFileManager {
 	 *         string if there is no associated file.
 	 */
 	public String getEventFilePath() {
-		log.debug("Event file path: " + this.filePath);
 		return this.filePath;
 	}
 }
