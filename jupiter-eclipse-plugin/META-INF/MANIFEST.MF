@@ -22,7 +22,7 @@ Require-Bundle: org.eclipse.ui.ide,
  org.eclipse.team.core,
  org.eclipse.search,
  org.eclipse.ui.console
-Eclipse-LazyStart: true
+Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: jupiter.jar
 Export-Package: edu.hawaii.ics.csdl.jupiter;uses:="junit.framework,edu.hawaii.ics.csdl.jupiter.model.reviewissue",
  edu.hawaii.ics.csdl.jupiter.ccvs;uses:="org.eclipse.core.runtime,org.eclipse.team.internal.ccvs.ui.operations,org.eclipse.team.internal.ccvs.core",

@@ -4,6 +4,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Table;
 
+import edu.hawaii.ics.csdl.jupiter.event.ReviewIssueModelException;
 import edu.hawaii.ics.csdl.jupiter.ui.view.table.ReviewTableView;
 
 public abstract class AbstractNavigationReviewEditorAction extends
@@ -22,13 +23,13 @@ public abstract class AbstractNavigationReviewEditorAction extends
 		super(text, image);
 	}
 
-	public AbstractNavigationReviewEditorAction(String text, int style) {
-		super(text, style);
-	}
-
 	@Override
 	public void run() {
-		processSave();
+		try {
+			processSave();
+		} catch (ReviewIssueModelException e) {
+			throw new RuntimeException(e);
+		}
 		table = reviewTableView.getTable();
 		int index = table.getSelectionIndex();
 		int length = table.getItemCount();

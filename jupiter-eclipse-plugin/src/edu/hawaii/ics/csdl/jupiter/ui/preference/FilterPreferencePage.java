@@ -26,6 +26,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import edu.hawaii.ics.csdl.jupiter.ReviewI18n;
 import edu.hawaii.ics.csdl.jupiter.ReviewPluginImpl;
 import edu.hawaii.ics.csdl.jupiter.file.PropertyResource;
+import edu.hawaii.ics.csdl.jupiter.file.serializers.SerializerException;
 import edu.hawaii.ics.csdl.jupiter.model.review.ReviewId;
 import edu.hawaii.ics.csdl.jupiter.model.review.ReviewModel;
 import edu.hawaii.ics.csdl.jupiter.model.reviewissue.KeyManager;
@@ -123,7 +124,12 @@ private PropertyResource propertyResource;
   protected Control createContents(Composite parent) {
     Composite top = createGeneralComposite(parent);
     createLabelContent(top);
-    createFilterPreferenceGroup(top);
+    try {
+		createFilterPreferenceGroup(top);
+	} catch (SerializerException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
     // Loads the preference store setting.
     loadFieldEditors(false);
     loadComposites();
@@ -194,8 +200,9 @@ private PropertyResource propertyResource;
    * Creates file preference group.
    *
    * @param parent the parent composite to be hooked.
+ * @throws SerializerException 
    */
-  private void createFilterPreferenceGroup(Composite parent) {
+  private void createFilterPreferenceGroup(Composite parent) throws SerializerException {
     final Group filterPreferenceGroup = new Group(parent, SWT.NONE);
     String filterLabelPreferenceKey = "FilterPreferencePage.filter.label.preference";
     filterPreferenceGroup.setText(ReviewI18n.getString(filterLabelPreferenceKey));
@@ -233,8 +240,9 @@ private PropertyResource propertyResource;
    * Creates the status filter sub group.
    *
    * @param parent the composite to be hooked.
+ * @throws SerializerException 
    */
-  private void createCheckBoxFilterSubGroup(Composite parent) {
+  private void createCheckBoxFilterSubGroup(Composite parent) throws SerializerException {
     Composite filterFieldSubGroup = new Composite(parent, SWT.NONE);
     GridLayout filterStatusLayout = new GridLayout();
     filterStatusLayout.numColumns = 2;
@@ -341,8 +349,9 @@ private PropertyResource propertyResource;
   /**
    * Creates the file filter field.
    * @param parent the composite to be hooked.
+ * @throws SerializerException 
    */
-  private void createFileFilterField(Composite parent) {
+  private void createFileFilterField(Composite parent) throws SerializerException {
     Composite filterFileComposite = new Composite(parent, SWT.NONE);
     filterFileComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
     String filterLabelFileKey = "FilterPreferencePage.filter.label.file";

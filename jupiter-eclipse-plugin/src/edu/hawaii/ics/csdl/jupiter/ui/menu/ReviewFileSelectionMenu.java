@@ -79,6 +79,8 @@ public class ReviewFileSelectionMenu {
 						}
 
 						menuItem.addSelectionListener(new SelectionAdapter() {
+							private FileResource fileResource;
+
 							public void widgetSelected(SelectionEvent event) {
 								String targetFile = (String) event.widget
 										.getData();
@@ -86,7 +88,8 @@ public class ReviewFileSelectionMenu {
 									IFile targetIFile = project
 											.getFile(targetFile);
 									int lineNumber = 0;
-									FileResource.goToLine(targetIFile,
+									
+									fileResource.goToLine(targetIFile,
 											lineNumber);
 								}
 							}

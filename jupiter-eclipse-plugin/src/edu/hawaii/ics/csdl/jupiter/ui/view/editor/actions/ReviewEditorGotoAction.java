@@ -2,6 +2,7 @@ package edu.hawaii.ics.csdl.jupiter.ui.view.editor.actions;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+
 import edu.hawaii.ics.csdl.jupiter.event.ReviewEvent;
 import edu.hawaii.ics.csdl.jupiter.file.FileResource;
 import edu.hawaii.ics.csdl.jupiter.model.reviewissue.ReviewIssue;

@@ -6,10 +6,8 @@ import edu.hawaii.ics.csdl.jupiter.ui.view.editor.ReviewEditorActionContainer;
 public class ReviewEditorPreviousAction extends
 		AbstractNavigationReviewEditorAction {
 
-	public static final String PREVIOUS = "Previous";
-
 	public ReviewEditorPreviousAction() {
-		super(PREVIOUS, ReviewEditorActionContainer.PREVIOUS_IMAGE_DESCRIPTOR);
+		super(ReviewEditorActionContainer.PREVIOUS, ReviewEditorActionContainer.PREVIOUS_IMAGE_DESCRIPTOR);
 	}
 	
 	@Override

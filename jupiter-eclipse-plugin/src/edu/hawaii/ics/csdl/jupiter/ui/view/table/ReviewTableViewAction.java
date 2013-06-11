@@ -42,7 +42,9 @@ import edu.hawaii.ics.csdl.jupiter.ReviewPluginImpl;
 import edu.hawaii.ics.csdl.jupiter.ccvs.RevisionOperation;
 import edu.hawaii.ics.csdl.jupiter.event.ReviewEvent;
 import edu.hawaii.ics.csdl.jupiter.event.ReviewIssueModelEvent;
+import edu.hawaii.ics.csdl.jupiter.event.ReviewIssueModelException;
 import edu.hawaii.ics.csdl.jupiter.file.FileResource;
+import edu.hawaii.ics.csdl.jupiter.file.serializers.SerializerException;
 import edu.hawaii.ics.csdl.jupiter.model.review.ReviewId;
 import edu.hawaii.ics.csdl.jupiter.model.review.ReviewModel;
 import edu.hawaii.ics.csdl.jupiter.model.review.ReviewerId;
@@ -54,8 +56,8 @@ import edu.hawaii.ics.csdl.jupiter.ui.menu.PhaseSelectionMenu;
 import edu.hawaii.ics.csdl.jupiter.ui.menu.ReviewFileSelectionMenu;
 import edu.hawaii.ics.csdl.jupiter.ui.preference.FilterPreferencePage;
 import edu.hawaii.ics.csdl.jupiter.ui.property.ReviewPropertyPage;
-import edu.hawaii.ics.csdl.jupiter.ui.view.editor.ReviewEditorView;
 import edu.hawaii.ics.csdl.jupiter.ui.view.editor.ReviewEditorActionContainer;
+import edu.hawaii.ics.csdl.jupiter.ui.view.editor.ReviewEditorView;
 import edu.hawaii.ics.csdl.jupiter.util.JupiterLogger;
 import edu.hawaii.ics.csdl.jupiter.util.ReviewDialog;
 
@@ -98,8 +100,16 @@ public class ReviewTableViewAction {
 			private ReviewModel reviewModel;
 
 			public void run() {
-				phaseSelectionMenu.doUpdateMenuCommand(reviewModel
-						.getPhaseManager().getPhaseNameKey());
+				try {
+					phaseSelectionMenu.doUpdateMenuCommand(reviewModel
+							.getPhaseManager().getPhaseNameKey());
+				} catch (SerializerException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ReviewIssueModelException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				int type = ReviewEvent.TYPE_COMMAND;
 				int kind = ReviewEvent.KIND_PHASE_SELECTION;
 				ReviewPluginImpl.getInstance().notifyListeners(type, kind);
@@ -242,6 +252,8 @@ public class ReviewTableViewAction {
 		FILTER.setImageDescriptor(ReviewPluginImpl
 				.createImageDescriptor("icons/filter.gif"));
 		GOTO = new Action("", Action.AS_DROP_DOWN_MENU) {
+			private FileResource fileResource;
+
 			public void run() {
 				ReviewTableView view = ReviewTableView.getActiveView();
 				if (view == null) {
@@ -262,7 +274,7 @@ public class ReviewTableViewAction {
 								.equals(""));
 						int lineNumber = Integer
 								.parseInt((isNumber) ? lineNumberString : "0");
-						FileResource.goToLine(targetIFile, lineNumber);
+						fileResource.goToLine(targetIFile, lineNumber);
 					}
 				} else {
 					openOneTableItemSelectionDialog();
@@ -378,6 +390,8 @@ public class ReviewTableViewAction {
 		};
 
 		EDIT = new Action() {
+			private ReviewEditorActionContainer reviewEditorActionContainer;
+
 			public void run() {
 				GOTO_REVISION_SOURCE.run();
 				ReviewTableView view = ReviewTableView.getActiveView();
@@ -394,7 +408,7 @@ public class ReviewTableViewAction {
 					} catch (ReviewException e) {
 						return;
 					}
-					ReviewEditorActionContainer.updateIcons();
+					reviewEditorActionContainer.updateIcons();
 					int type = ReviewEvent.TYPE_COMMAND;
 					int kind = ReviewEvent.KIND_EDIT;
 					ReviewPluginImpl.getInstance().notifyListeners(type, kind);
@@ -413,6 +427,7 @@ public class ReviewTableViewAction {
 			private IProject previousProject = null;
 			private ReviewId previousReviewId = null;
 			private ReviewModel reviewModel;
+			private ReviewEditorActionContainer reviewEditorActionContainer;
 
 			public void run() {
 				ReviewTableView view = ReviewTableView.getActiveView();
@@ -448,7 +463,7 @@ public class ReviewTableViewAction {
 						}
 					}
 				}
-				ReviewEditorActionContainer.updateIcons();
+				reviewEditorActionContainer.updateIcons();
 			}
 		};
 		ADD = new Action() {
@@ -463,8 +478,17 @@ public class ReviewTableViewAction {
 				ReviewId reviewId = reviewModel.getReviewIdManager()
 						.getReviewId();
 				if (project == null || reviewId == null) {
-					boolean isSuccess = phaseSelectionMenu
-							.doUpdateMenuCommand(reviewPhaseNameKey);
+					boolean isSuccess = false;
+					try {
+						isSuccess = phaseSelectionMenu
+								.doUpdateMenuCommand(reviewPhaseNameKey);
+					} catch (SerializerException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (ReviewIssueModelException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					if (!isSuccess) {
 						return;
 					}
@@ -533,7 +557,12 @@ public class ReviewTableViewAction {
 					for (Iterator<?> i = ((IStructuredSelection) selection)
 							.iterator(); i.hasNext();) {
 						model.remove((ReviewIssue) i.next());
-						model.notifyListeners(ReviewIssueModelEvent.DELETE);
+						try {
+							model.notifyListeners(ReviewIssueModelEvent.DELETE);
+						} catch (ReviewIssueModelException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
 					view.getViewer().refresh();
 					table = view.getTable();

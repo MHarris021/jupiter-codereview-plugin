@@ -23,10 +23,12 @@ import edu.hawaii.ics.csdl.jupiter.ReviewI18n;
 import edu.hawaii.ics.csdl.jupiter.ReviewPluginImpl;
 import edu.hawaii.ics.csdl.jupiter.event.ReviewEvent;
 import edu.hawaii.ics.csdl.jupiter.event.ReviewIssueModelEvent;
+import edu.hawaii.ics.csdl.jupiter.event.ReviewIssueModelException;
 import edu.hawaii.ics.csdl.jupiter.file.FileResource;
 import edu.hawaii.ics.csdl.jupiter.file.PreferenceResource;
 import edu.hawaii.ics.csdl.jupiter.file.PropertyResource;
 import edu.hawaii.ics.csdl.jupiter.file.ReviewResource;
+import edu.hawaii.ics.csdl.jupiter.file.serializers.SerializerException;
 import edu.hawaii.ics.csdl.jupiter.model.columndata.ColumnDataModel;
 import edu.hawaii.ics.csdl.jupiter.model.columndata.ColumnDataModelManager;
 import edu.hawaii.ics.csdl.jupiter.model.review.ReviewId;
@@ -43,8 +45,8 @@ import edu.hawaii.ics.csdl.jupiter.model.reviewissue.Status;
 import edu.hawaii.ics.csdl.jupiter.model.reviewissue.StatusKeyManager;
 import edu.hawaii.ics.csdl.jupiter.model.reviewissue.Type;
 import edu.hawaii.ics.csdl.jupiter.model.reviewissue.TypeKeyManager;
-import edu.hawaii.ics.csdl.jupiter.ui.view.editor.ReviewEditorView;
 import edu.hawaii.ics.csdl.jupiter.ui.view.editor.ReviewEditorActionContainer;
+import edu.hawaii.ics.csdl.jupiter.ui.view.editor.ReviewEditorView;
 import edu.hawaii.ics.csdl.jupiter.ui.view.table.FilterPhase;
 import edu.hawaii.ics.csdl.jupiter.ui.view.table.ReviewTableView;
 import edu.hawaii.ics.csdl.jupiter.util.ReviewDialog;
@@ -85,6 +87,7 @@ public class ReviewAdditionActionDelegate implements IEditorActionDelegate,
 	
 	@Autowired
 	private IWorkbench workbench;
+	private ReviewEditorActionContainer reviewEditorActionContainer;
 
 	public ReviewAdditionActionDelegate() {
 	}
@@ -108,7 +111,16 @@ public class ReviewAdditionActionDelegate implements IEditorActionDelegate,
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
 	public void run(IAction action) {
-		boolean isDetermined = determineProjectReviewIdReviewerId();
+		boolean isDetermined = false;
+		try {
+			isDetermined = determineProjectReviewIdReviewerId();
+		} catch (SerializerException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (ReviewIssueModelException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		if (!isDetermined) {
 			return;
 		}
@@ -169,8 +181,8 @@ public class ReviewAdditionActionDelegate implements IEditorActionDelegate,
 								.getInstance(project, reviewId).getDefault(),
 						iReviewFile);
 				reviewIssue.setLinked(true);
-				ReviewEditorActionContainer.nextAction.setEnabled(false);
-				ReviewEditorActionContainer.previousAction.setEnabled(false);
+				reviewEditorActionContainer.getNextAction().setEnabled(false);
+				reviewEditorActionContainer.getPreviousAction().setEnabled(false);
 				editorView.setReviewIssue(reviewIssue);
 			} else {
 				editorView.setNewEmptyReviewIssue(iReviewFile);
@@ -192,8 +204,10 @@ public class ReviewAdditionActionDelegate implements IEditorActionDelegate,
 	 * 
 	 * @return <code>true</code> if the project, review id, and reviewer id,
 	 *         were determined.
+	 * @throws SerializerException 
+	 * @throws ReviewIssueModelException 
 	 */
-	public boolean determineProjectReviewIdReviewerId() {
+	public boolean determineProjectReviewIdReviewerId() throws SerializerException, ReviewIssueModelException {
 		boolean isReviewSelectionWizardInvoked = false;
 		IProject project = fileResource.getActiveProject();
 		// assertion project should not be null.

@@ -5,6 +5,7 @@ import org.eclipse.core.resources.IProject;
 
 import edu.hawaii.ics.csdl.jupiter.file.FileResource;
 import edu.hawaii.ics.csdl.jupiter.file.serializers.ReviewSerializer;
+import edu.hawaii.ics.csdl.jupiter.file.serializers.SerializerException;
 import edu.hawaii.ics.csdl.jupiter.model.review.ReviewId;
 
 /**
@@ -39,8 +40,9 @@ public class ReviewIssueModelManager {
 	 * @param reviewId
 	 *            the review id.
 	 * @return the <code>ReviewIssueModel</code> instance.
+	 * @throws SerializerException 
 	 */
-	public ReviewIssueModel createReviewIssueModel(IProject project, ReviewId reviewId) {
+	public ReviewIssueModel createReviewIssueModel(IProject project, ReviewId reviewId) throws SerializerException {
 		if (project == null) {
 			throw new IllegalArgumentException("project is null");
 		}

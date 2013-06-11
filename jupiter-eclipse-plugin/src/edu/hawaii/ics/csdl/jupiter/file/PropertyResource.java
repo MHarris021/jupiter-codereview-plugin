@@ -93,8 +93,6 @@ public class PropertyResource {
 	private void fillReviewIdReviewMap(IProject project) {
 		try {
 			this.property = serializer.newProperty(project);
-		} catch (ReviewException e) {
-			log.error(e);
 		} catch (SerializerException e) {
 			log.error(e);
 		}

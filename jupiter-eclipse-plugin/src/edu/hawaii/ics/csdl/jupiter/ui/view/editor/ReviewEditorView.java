@@ -89,6 +89,8 @@ public class ReviewEditorView extends ViewPart {
 	private EventFileManager eventFileManager;
 	private ReviewModel reviewModel;
 
+	private ReviewEditorActionContainer editorActionContainer;
+
 	/**
 	 * Instantiates this instance for the Eclipse platform. Clients should not
 	 * call this. Instead, call <code>getInstance</code>.
@@ -197,13 +199,13 @@ public class ReviewEditorView extends ViewPart {
 	 */
 	private void fillLocalToolBar(IToolBarManager manager) {
 		// manager.add(ReviewEditorActionContainer.UNDO);
-		manager.add(ReviewEditorViewAction.GOTO);
+		manager.add(editorActionContainer.getGotoAction());
 		manager.add(new Separator("Additions"));
-		manager.add(ReviewEditorViewAction.NEXT);
-		manager.add(ReviewEditorViewAction.PREVIOUS);
+		manager.add(editorActionContainer.getNextAction());
+		manager.add(editorActionContainer.getPreviousAction());
 		manager.add(new Separator("Additions"));
-		manager.add(ReviewEditorViewAction.);
-		manager.add(ReviewEditorViewAction.clearAction);
+		manager.add(editorActionContainer.getSaveAction());
+		manager.add(editorActionContainer.getClearAction());
 	}
 
 	/**
@@ -219,10 +221,7 @@ public class ReviewEditorView extends ViewPart {
 		textActionHandler.addText(this.teamDescriptionText);
 		textActionHandler.addText(this.reworkDescriptionText);
 		getViewSite().getActionBars().setGlobalActionHandler("reviewSave",
-				ReviewEditorViewAction.SAVE);
-		// RetargetAction action = new RetargetAction();
-		// getViewSite().getPage().getWorkbenchWindow().getPartService().
-		// addPartListener(ReviewEditorActionContainer.SAVE);
+				editorActionContainer.getSaveAction());
 	}
 
 	/**
@@ -576,8 +575,7 @@ public class ReviewEditorView extends ViewPart {
 	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
 	 */
 	public void setFocus() {
-		String phaseNameKey = reviewModel.getPhaseManager()
-				.getPhaseNameKey();
+		String phaseNameKey = reviewModel.getPhaseManager().getPhaseNameKey();
 		if (phaseNameKey.equals(ResourceBundleKey.PHASE_INFIVIDUAL)) {
 			this.typeCombo.setFocus();
 		} else if (phaseNameKey.equals(ResourceBundleKey.PHASE_TEAM)) {
@@ -727,12 +725,7 @@ public class ReviewEditorView extends ViewPart {
 		ReviewTableViewAction.DELETE.setEnabled(isEnabled);
 		// ReviewTableViewAction.FILTER.setEnabled(isEnabled);
 		ReviewTableViewAction.PROPERTY_SETTING.setEnabled(isEnabled);
-		ReviewEditorViewAction.UNDO.setEnabled(isEnabled);
-		ReviewEditorViewAction.GOTO.setEnabled(isEnabled);
-		ReviewEditorViewAction.NEXT.setEnabled(isEnabled);
-		ReviewEditorViewAction.PREVIOUS.setEnabled(isEnabled);
-		ReviewEditorViewAction.SAVE.setEnabled(isEnabled);
-		ReviewEditorViewAction.clearAction.setEnabled(isEnabled);
+		editorActionContainer.setEnabled(isEnabled);
 	}
 
 	/**
@@ -763,8 +756,8 @@ public class ReviewEditorView extends ViewPart {
 				.getReviewId());
 		this.assignedToCombo
 				.setItems((items == null) ? new String[] {} : items);
-		String author = reviewModel.getReviewIdManager()
-				.getReviewId().getAuthor();
+		String author = reviewModel.getReviewIdManager().getReviewId()
+				.getAuthor();
 		assignedToCombo.setText(author);
 		ResolutionKeyManager resolutionKeyManager = ResolutionKeyManager
 				.getInstance(project, reviewId);
@@ -843,9 +836,9 @@ public class ReviewEditorView extends ViewPart {
 					.getLocalizedLabel(statusKey);
 			this.statusCombo.select(statusCombo.indexOf(localizedStatusText));
 			this.updateTitle();
-			ReviewEditorViewAction.GOTO.setEnabled(reviewIssue.isLinked());
-			eventFileManager.setEventFilePath(
-					this.reviewIssue.getTargetFile());
+			editorActionContainer.getGotoAction().setEnabled(
+					reviewIssue.isLinked());
+			eventFileManager.setEventFilePath(this.reviewIssue.getTargetFile());
 		}
 	}
 
@@ -989,11 +982,10 @@ public class ReviewEditorView extends ViewPart {
 						.getInstance(project, reviewId).getDefault(),
 				(Status) StatusKeyManager.getInstance(project, reviewId)
 						.getDefault(), iReviewFile);
-		ReviewEditorViewAction.NEXT.setEnabled(false);
-		ReviewEditorViewAction.PREVIOUS.setEnabled(false);
+		editorActionContainer.getNextAction().setEnabled(false);
+		editorActionContainer.getPreviousAction().setEnabled(false);
 		this.setReviewIssue(reviewIssue);
-		eventFileManager.setEventFilePath(
-				reviewIssue.getTargetFile());
+		eventFileManager.setEventFilePath(reviewIssue.getTargetFile());
 	}
 
 	/**

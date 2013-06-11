@@ -9,6 +9,8 @@ import org.eclipse.ui.actions.ActionDelegate;
 
 import edu.hawaii.ics.csdl.jupiter.ReviewPluginImpl;
 import edu.hawaii.ics.csdl.jupiter.event.ReviewEvent;
+import edu.hawaii.ics.csdl.jupiter.event.ReviewIssueModelException;
+import edu.hawaii.ics.csdl.jupiter.file.serializers.SerializerException;
 import edu.hawaii.ics.csdl.jupiter.model.review.ReviewModel;
 import edu.hawaii.ics.csdl.jupiter.ui.menu.PhaseSelectionMenu;
 import edu.hawaii.ics.csdl.jupiter.ui.perspective.ReviewPerspectiveFactory;
@@ -55,8 +57,17 @@ public class PhaseSelectionActionDelegate extends ActionDelegate implements
 		ReviewPerspectiveFactory.showPerspective();
 		String reviewPhaseNameKey = reviewModel.getPhaseManager()
 				.getPhaseNameKey();
-		boolean isSuccess = phaseSelectionMenu
-				.doUpdateMenuCommand(reviewPhaseNameKey);
+		boolean isSuccess = false;
+		try {
+			isSuccess = phaseSelectionMenu
+					.doUpdateMenuCommand(reviewPhaseNameKey);
+		} catch (SerializerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ReviewIssueModelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		if (isSuccess) {
 			int type = ReviewEvent.TYPE_COMMAND;
 			int kind = ReviewEvent.KIND_PHASE_SELECTION;

@@ -29,6 +29,7 @@ import edu.hawaii.ics.csdl.jupiter.ReviewI18n;
 import edu.hawaii.ics.csdl.jupiter.ReviewPluginImpl;
 import edu.hawaii.ics.csdl.jupiter.event.IReviewIssueModelListener;
 import edu.hawaii.ics.csdl.jupiter.event.ReviewIssueModelEvent;
+import edu.hawaii.ics.csdl.jupiter.event.ReviewIssueModelException;
 import edu.hawaii.ics.csdl.jupiter.file.PreferenceResource;
 import edu.hawaii.ics.csdl.jupiter.model.columndata.ColumnData;
 import edu.hawaii.ics.csdl.jupiter.model.columndata.ColumnDataModel;
@@ -178,7 +179,12 @@ public class ReviewTableView extends TableViewPart {
 				null));
 		viewer.setInput(ResourcesPlugin.getWorkspace());
 		reviewIssueModel.addListener(modelListener);
-		reviewIssueModel.notifyListeners(ReviewIssueModelEvent.MERGE);
+		try {
+			reviewIssueModel.notifyListeners(ReviewIssueModelEvent.MERGE);
+		} catch (ReviewIssueModelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		IWorkbenchPage page = getSite().getPage();
 		page.addPartListener(this.partListener);
 		// page.addSelectionListener(this.markerSelectionListener);

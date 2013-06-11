@@ -7,7 +7,7 @@ public class ReviewEditorNextAction extends
 		AbstractNavigationReviewEditorAction {
 
 	public ReviewEditorNextAction() {
-		super("Next", ReviewEditorActionContainer.NEXT_IMAGE_DESCRIPTOR);
+		super(ReviewEditorActionContainer.NEXT, ReviewEditorActionContainer.NEXT_IMAGE_DESCRIPTOR);
 	}
 
 	@Override

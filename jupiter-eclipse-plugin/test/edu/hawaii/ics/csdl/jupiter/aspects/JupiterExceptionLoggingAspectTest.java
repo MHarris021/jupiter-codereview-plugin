@@ -1,6 +1,7 @@
 package edu.hawaii.ics.csdl.jupiter.aspects;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.File;
 
@@ -40,6 +41,7 @@ public class JupiterExceptionLoggingAspectTest {
 	@Test(expected = SerializerException.class)
 	public void test() throws SerializerException {
 		assertNotNull(aspect);
+		
 		assertNotNull(propertySerializer);
 
 		Property property = propertySerializer.deserialize(new File("f"));

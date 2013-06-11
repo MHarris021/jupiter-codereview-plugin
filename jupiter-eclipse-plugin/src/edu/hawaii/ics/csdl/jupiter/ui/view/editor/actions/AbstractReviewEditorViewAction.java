@@ -1,4 +1,3 @@
-
 package edu.hawaii.ics.csdl.jupiter.ui.view.editor.actions;
 
 import org.eclipse.jface.action.Action;
@@ -9,10 +8,11 @@ import edu.hawaii.ics.csdl.jupiter.ReviewI18n;
 import edu.hawaii.ics.csdl.jupiter.ReviewPlugin;
 import edu.hawaii.ics.csdl.jupiter.event.ReviewEvent;
 import edu.hawaii.ics.csdl.jupiter.event.ReviewIssueModelEvent;
+import edu.hawaii.ics.csdl.jupiter.event.ReviewIssueModelException;
 import edu.hawaii.ics.csdl.jupiter.model.reviewissue.ReviewIssue;
 import edu.hawaii.ics.csdl.jupiter.model.reviewissue.ReviewIssueModel;
-import edu.hawaii.ics.csdl.jupiter.ui.view.editor.ReviewEditorView;
 import edu.hawaii.ics.csdl.jupiter.ui.view.editor.ReviewEditorActionContainer;
+import edu.hawaii.ics.csdl.jupiter.ui.view.editor.ReviewEditorView;
 import edu.hawaii.ics.csdl.jupiter.ui.view.table.ReviewTableView;
 
 /**
@@ -27,10 +27,10 @@ public abstract class AbstractReviewEditorViewAction extends Action {
 	private ReviewEditorView reviewEditorView;
 
 	private ReviewPlugin reviewPlugin;
-	
+
 	private ReviewIssueModel reviewIssueModel;
-	
-	private ReviewEditorActionContainer reviewEditorActionContainer; 
+
+	private ReviewEditorActionContainer reviewEditorActionContainer;
 
 	/**
 	 * @param text
@@ -55,7 +55,11 @@ public abstract class AbstractReviewEditorViewAction extends Action {
 
 	@Override
 	public void run() {
-		processSave();
+		try {
+			processSave();
+		} catch (ReviewIssueModelException e) {
+			throw new RuntimeException(e);
+		}
 		runEditorAction();
 		reviewPlugin.notifyListeners(type, kind);
 	}
@@ -93,23 +97,23 @@ public abstract class AbstractReviewEditorViewAction extends Action {
 	public void setReviewPlugin(ReviewPlugin reviewPlugin) {
 		this.reviewPlugin = reviewPlugin;
 	}
-	
+
 	/**
 	 * Processes saving an issue.
 	 * 
 	 * @return <code>true</code> if successfully saved. <code>false</code>
 	 *         otherwise.
+	 * @throws ReviewIssueModelException
 	 */
-	protected boolean processSave() {
+	protected boolean processSave() throws ReviewIssueModelException {
 		if (reviewEditorView == null) {
 			return false;
 		}
 		ReviewIssue savingReviewIssue = reviewEditorView.getReviewIssue();
-		String activeTabNameKey = reviewEditorView.getActiveTabNameKey();
 		if (savingReviewIssue == null) {
 			return false;
 		}
-		
+
 		// make sure the editingCodeReview is contained.
 		if (reviewIssueModel.contains(savingReviewIssue.getIssueId())) {
 			ReviewIssue originalReviewIssue = reviewIssueModel
@@ -140,14 +144,13 @@ public abstract class AbstractReviewEditorViewAction extends Action {
 	public void setReviewIssueModel(ReviewIssueModel reviewIssueModel) {
 		this.reviewIssueModel = reviewIssueModel;
 	}
-	
-	
 
 	public ReviewEditorActionContainer getReviewEditorViewAction() {
 		return reviewEditorActionContainer;
 	}
 
-	public void setReviewEditorViewAction(ReviewEditorActionContainer reviewEditorActionContainer) {
+	public void setReviewEditorViewAction(
+			ReviewEditorActionContainer reviewEditorActionContainer) {
 		this.reviewEditorActionContainer = reviewEditorActionContainer;
 	}
 

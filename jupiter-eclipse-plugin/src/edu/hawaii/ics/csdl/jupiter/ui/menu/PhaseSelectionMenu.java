@@ -17,10 +17,12 @@ import edu.hawaii.ics.csdl.jupiter.ReviewI18n;
 import edu.hawaii.ics.csdl.jupiter.ReviewPluginImpl;
 import edu.hawaii.ics.csdl.jupiter.event.ReviewEvent;
 import edu.hawaii.ics.csdl.jupiter.event.ReviewIssueModelEvent;
+import edu.hawaii.ics.csdl.jupiter.event.ReviewIssueModelException;
 import edu.hawaii.ics.csdl.jupiter.file.FileResource;
 import edu.hawaii.ics.csdl.jupiter.file.PreferenceResource;
 import edu.hawaii.ics.csdl.jupiter.file.PropertyResource;
 import edu.hawaii.ics.csdl.jupiter.file.ReviewResource;
+import edu.hawaii.ics.csdl.jupiter.file.serializers.SerializerException;
 import edu.hawaii.ics.csdl.jupiter.model.columndata.ColumnDataModel;
 import edu.hawaii.ics.csdl.jupiter.model.columndata.ColumnDataModelManager;
 import edu.hawaii.ics.csdl.jupiter.model.review.ReviewId;
@@ -35,7 +37,6 @@ import edu.hawaii.ics.csdl.jupiter.ui.view.editor.ReviewEditorView;
 import edu.hawaii.ics.csdl.jupiter.ui.view.table.FilterPhase;
 import edu.hawaii.ics.csdl.jupiter.ui.view.table.ReviewTableView;
 import edu.hawaii.ics.csdl.jupiter.ui.view.table.ReviewTableViewAction;
-import edu.hawaii.ics.csdl.jupiter.util.JupiterLogger;
 import edu.hawaii.ics.csdl.jupiter.util.ReviewDialog;
 
 /**
@@ -122,7 +123,15 @@ public class PhaseSelectionMenu {
 				public void widgetSelected(SelectionEvent event) {
 					ReviewPerspectiveFactory.showPerspective();
 					String reviewPhaseNameKey = (String) event.widget.getData();
-					doUpdateMenuCommand(reviewPhaseNameKey);
+					try {
+						doUpdateMenuCommand(reviewPhaseNameKey);
+					} catch (SerializerException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (ReviewIssueModelException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					int type = ReviewEvent.TYPE_COMMAND;
 					int kind = ReviewEvent.KIND_PHASE_SELECTION;
 					ReviewPluginImpl.getInstance().notifyListeners(type, kind);
@@ -162,7 +171,16 @@ public class PhaseSelectionMenu {
 				public void widgetSelected(SelectionEvent event) {
 					ReviewPerspectiveFactory.showPerspective();
 					String reviewPhaseNameKey = (String) event.widget.getData();
-					boolean isSuccess = doSelectionMenuCommand(reviewPhaseNameKey);
+					boolean isSuccess = false;
+					try {
+						isSuccess = doSelectionMenuCommand(reviewPhaseNameKey);
+					} catch (ReviewIssueModelException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (SerializerException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					if (!isSuccess) {
 						return;
 					}
@@ -180,8 +198,10 @@ public class PhaseSelectionMenu {
 	 * @param reviewPhaseNameKey
 	 *            the review phase name key.
 	 * @return <code>true</code> if selection process was completed.
+	 * @throws ReviewIssueModelException 
+	 * @throws SerializerException 
 	 */
-	private boolean doSelectionMenuCommand(String reviewPhaseNameKey) {
+	private boolean doSelectionMenuCommand(String reviewPhaseNameKey) throws ReviewIssueModelException, SerializerException {
 		// set the selected review phase name key int review model.
 		reviewModel.notifyListeners(reviewPhaseNameKey);
 
@@ -320,8 +340,10 @@ public class PhaseSelectionMenu {
 	 * @param reviewPhaseNameKey
 	 *            the review phase name key.
 	 * @return <code>true</code> if update process was completed.
+	 * @throws SerializerException 
+	 * @throws ReviewIssueModelException 
 	 */
-	public boolean doUpdateMenuCommand(String reviewPhaseNameKey) {
+	public boolean doUpdateMenuCommand(String reviewPhaseNameKey) throws SerializerException, ReviewIssueModelException {
 		// set the selected review phase name key into review model.
 		reviewModel.notifyListeners(reviewPhaseNameKey);
 		IProject project = fileResource.getActiveProject();

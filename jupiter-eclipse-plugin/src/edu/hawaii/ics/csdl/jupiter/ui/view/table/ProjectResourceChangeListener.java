@@ -10,6 +10,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.widgets.Display;
 
 import edu.hawaii.ics.csdl.jupiter.event.ReviewIssueModelEvent;
+import edu.hawaii.ics.csdl.jupiter.event.ReviewIssueModelException;
 import edu.hawaii.ics.csdl.jupiter.model.reviewissue.ReviewIssueModel;
 import edu.hawaii.ics.csdl.jupiter.util.JupiterLogger;
 
@@ -57,7 +58,12 @@ private ReviewIssueModel reviewIssueModel;
       if (!((IProject) resource).isOpen()) {
         log.debug("project was closed: " + ((IProject) resource).getName());
         reviewIssueModel.clear();
-        reviewIssueModel.notifyListeners(ReviewIssueModelEvent.CLEAR);
+        try {
+			reviewIssueModel.notifyListeners(ReviewIssueModelEvent.CLEAR);
+		} catch (ReviewIssueModelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         Display.getDefault().asyncExec(new Runnable() {
           public void run() {
             ReviewTableViewAction.NOTIFY_EDITOR.run();

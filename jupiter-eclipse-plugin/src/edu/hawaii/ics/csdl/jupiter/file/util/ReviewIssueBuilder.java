@@ -20,9 +20,9 @@ public class ReviewIssueBuilder {
 	 * @param reviewIssue
 	 *            The Jupiter review issue to create an object of.
 	 * @param dateFormat
-	 *            TODO
+	 *            
 	 * @param simpleDateFormat
-	 *            TODO
+	 *            
 	 * @return Returns the <code>ReviewIssue</code> to write to file.
 	 */
 	public static edu.hawaii.ics.csdl.jupiter.file.review.ReviewIssue createXmlReviewIssue(

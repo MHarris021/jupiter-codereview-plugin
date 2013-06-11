@@ -15,8 +15,8 @@ import org.springframework.stereotype.Component;
 
 import edu.hawaii.ics.csdl.jupiter.ReviewException;
 import edu.hawaii.ics.csdl.jupiter.file.review.Review;
-import edu.hawaii.ics.csdl.jupiter.file.util.ReviewFileStructureUtils;
 import edu.hawaii.ics.csdl.jupiter.file.util.ReviewBuilder;
+import edu.hawaii.ics.csdl.jupiter.file.util.ReviewFileStructureUtils;
 import edu.hawaii.ics.csdl.jupiter.file.util.ReviewIssueBuilder;
 import edu.hawaii.ics.csdl.jupiter.file.util.ReviewModelResolver;
 import edu.hawaii.ics.csdl.jupiter.model.review.ReviewId;

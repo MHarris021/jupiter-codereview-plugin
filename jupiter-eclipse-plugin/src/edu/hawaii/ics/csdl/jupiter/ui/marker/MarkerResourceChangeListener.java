@@ -11,6 +11,7 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
 
 import edu.hawaii.ics.csdl.jupiter.event.ReviewIssueModelEvent;
+import edu.hawaii.ics.csdl.jupiter.event.ReviewIssueModelException;
 import edu.hawaii.ics.csdl.jupiter.file.FileResource;
 import edu.hawaii.ics.csdl.jupiter.model.reviewissue.ReviewIssue;
 import edu.hawaii.ics.csdl.jupiter.model.reviewissue.ReviewIssueModel;
@@ -107,7 +108,12 @@ private ReviewIssueModel reviewIssueModel;
       }
       if (isReviewMarker) {
         log.debug("review marker was moved along with resource change.");
-        reviewIssueModel.notifyListeners(ReviewIssueModelEvent.EDIT);
+        try {
+			reviewIssueModel.notifyListeners(ReviewIssueModelEvent.EDIT);
+		} catch (ReviewIssueModelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
       }
       return true; // visit the children
     }

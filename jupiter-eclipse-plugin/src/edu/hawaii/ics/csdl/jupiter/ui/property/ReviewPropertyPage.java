@@ -33,6 +33,7 @@ import edu.hawaii.ics.csdl.jupiter.ReviewI18n;
 import edu.hawaii.ics.csdl.jupiter.file.FileResource;
 import edu.hawaii.ics.csdl.jupiter.file.PropertyConstraints;
 import edu.hawaii.ics.csdl.jupiter.file.PropertyResource;
+import edu.hawaii.ics.csdl.jupiter.file.serializers.SerializerException;
 import edu.hawaii.ics.csdl.jupiter.model.review.ReviewId;
 import edu.hawaii.ics.csdl.jupiter.util.JupiterLogger;
 import edu.hawaii.ics.csdl.jupiter.util.ReviewDialog;
@@ -201,7 +202,12 @@ public class ReviewPropertyPage extends PropertyPage implements
 		removeButton.setEnabled(false);
 		removeButton.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event e) {
-				removeReviewId();
+				try {
+					removeReviewId();
+				} catch (SerializerException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		});
 		FormData removeButtonData = new FormData();
@@ -280,8 +286,9 @@ public class ReviewPropertyPage extends PropertyPage implements
 
 	/**
 	 * Removes the selected review ID
+	 * @throws SerializerException 
 	 */
-	private void removeReviewId() {
+	private void removeReviewId() throws SerializerException {
 		int selectedIndex = table.getSelectionIndex();
 		if (selectedIndex >= 0) {
 			ReviewId reviewId = (ReviewId) tableViewer

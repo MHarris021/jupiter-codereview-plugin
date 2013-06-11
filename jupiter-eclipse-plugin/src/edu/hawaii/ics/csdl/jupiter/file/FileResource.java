@@ -35,7 +35,6 @@ import edu.hawaii.ics.csdl.jupiter.file.util.ReviewFileStructureUtils;
 import edu.hawaii.ics.csdl.jupiter.file.util.ReviewUtils;
 import edu.hawaii.ics.csdl.jupiter.model.review.ReviewId;
 import edu.hawaii.ics.csdl.jupiter.model.review.ReviewerId;
-import edu.hawaii.ics.csdl.jupiter.util.JupiterLogger;
 
 /**
  * Provides a way to create a review file.

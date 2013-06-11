@@ -14,6 +14,7 @@ import org.eclipse.jface.viewers.Viewer;
 
 import edu.hawaii.ics.csdl.jupiter.event.IReviewIssueModelListener;
 import edu.hawaii.ics.csdl.jupiter.event.ReviewIssueModelEvent;
+import edu.hawaii.ics.csdl.jupiter.event.ReviewIssueModelException;
 import edu.hawaii.ics.csdl.jupiter.ui.marker.ReviewMarker;
 import edu.hawaii.ics.csdl.jupiter.util.JupiterLogger;
 
@@ -228,8 +229,9 @@ public class ReviewIssueModel implements IStructuredContentProvider {
 	 * @param type
 	 *            the event type of the <code>ReviewIssueModelEvent</code> when
 	 *            notifying to listeners.
+	 * @throws ReviewIssueModelException 
 	 */
-	public void notifyListeners(int type) {
+	public void notifyListeners(int type) throws ReviewIssueModelException {
 		this.notifyListeners(new ReviewIssueModelEvent(
 				this.notifyTargetReviewIssue, type, null));
 	}
@@ -239,8 +241,9 @@ public class ReviewIssueModel implements IStructuredContentProvider {
 	 * 
 	 * @param event
 	 *            the <code>CodeReviewModelEvent</code> instance.
+	 * @throws ReviewIssueModelException 
 	 */
-	private void notifyListeners(ReviewIssueModelEvent event) {
+	private void notifyListeners(ReviewIssueModelEvent event) throws ReviewIssueModelException {
 		Object[] listeners = listenerList.getListeners();
 		for (int i = 0; i < listeners.length; i++) {
 			((IReviewIssueModelListener) listeners[i])
